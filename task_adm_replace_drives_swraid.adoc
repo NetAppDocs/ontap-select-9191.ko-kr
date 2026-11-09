@@ -1,0 +1,294 @@
+---
+sidebar: sidebar 
+permalink: task_adm_replace_drives_swraid.html 
+keywords: administer, administering, web, software raid, replace drive 
+summary: '소프트웨어 RAID를 사용하는 드라이브에 장애가 발생하면 ONTAP Select는 스페어 디스크(사용 가능한 경우)를 사용하여 재구축 프로세스를 자동으로 시작합니다. 이는 FAS 및 AFF의 ONTAP 작동 방식과 유사합니다. 그러나 스페어 디스크를 사용할 수 없는 경우 ONTAP Select 노드에 스페어 디스크를 추가해야 합니다.' 
+---
+= ONTAP Select에 대해 장애가 발생한 소프트웨어 RAID 드라이브 교체
+:hardbreaks:
+:allow-uri-read: 
+:nofooter: 
+:icons: font
+:linkattrs: 
+:imagesdir: ./media/
+
+
+[role="lead"]
+소프트웨어 RAID를 사용하는 드라이브에 오류가 발생하면 ONTAP Select는 사용 가능한 스페어 드라이브가 있는 경우 해당 드라이브를 할당하고 재구축 프로세스를 자동으로 시작합니다. 이는 FAS 및 AFF에서 ONTAP가 작동하는 방식과 유사합니다. 그러나 사용 가능한 스페어 드라이브가 없는 경우 ONTAP Select 노드에 스페어 드라이브를 추가해야 합니다.
+
+
+NOTE: 오류 발생 디스크를 제거하고 새 드라이브(스페어로 표시됨)를 추가하는 작업은 모두 ONTAP Select Deploy를 통해 수행해야 합니다. vSphere를 사용하여 ONTAP Select VM에 드라이브를 연결하는 것은 지원되지 않습니다.
+
+
+
+[[identify-the-failed-drive]]
+== 오류 발생 드라이브 식별
+
+드라이브에 오류가 발생하면 ONTAP CLI를 사용하여 오류 발생 디스크를 식별해야 합니다.
+
+[role="tabbed-block"]
+====
+.KVM
+--
+.시작하기 전에
+ONTAP Select 가상 머신의 VM ID와 ONTAP Select 및 ONTAP Select Deploy 관리자 계정 자격 증명이 있어야 합니다.
+
+.이 작업 정보
+이 절차는 ONTAP Select 노드가 KVM에서 실행 중이고 소프트웨어 RAID를 사용하도록 구성된 경우에만 사용해야 합니다.
+
+.단계
+. ONTAP Select CLI에서 교체할 디스크를 식별합니다.
++
+.. 가상 머신에서 일련 번호, UUID 또는 타겟 주소로 디스크를 식별합니다.
++
+[listing]
+----
+disk show -fields serial,vmdisk-target-address,uuid
+----
+.. 선택적으로 파티션된 디스크와 함께 스페어 디스크 용량의 전체 목록을 표시합니다. storage aggregate show-spare-disks
+
+
+. Linux 명령줄 인터페이스에서 디스크를 찾으십시오.
++
+.. 시스템 장치를 검사하여 디스크 일련 번호 또는 UUID(디스크 이름)를 찾으십시오.
++
+[listing]
+----
+find /dev/disk/by-id/<SN|ID>
+----
+.. 가상 머신 구성을 검사하여 타겟 주소를 찾으십시오.
++
+[listing]
+----
+virsh dumpxml VMID
+----
+
+
+
+
+--
+.ESXi
+--
+.단계
+. 관리자 계정을 사용하여 ONTAP CLI에 로그인하십시오.
+. 오류가 발생한 디스크 드라이브를 확인하십시오.
++
+[listing]
+----
+<cluster name>::> storage disk show -container-type broken
+Usable Disk Container Container
+Disk Size Shelf Bay Type Type Name Owner
+---------------- ---------- ----- --- ------- ----------- --------- --------
+NET-1.4 893.3GB - - SSD broken - sti-rx2540-346a'
+----
+
+
+--
+====
+
+
+[[remove-the-failed-drive]]
+== 오류 발생 드라이브를 제거합니다
+
+오류가 발생한 드라이브를 확인한 후 디스크를 제거하십시오.
+
+[role="tabbed-block"]
+====
+.Deploy를 사용하는 KVM
+--
+디스크를 교체하거나 더 이상 필요하지 않을 때 KVM 호스트에서 디스크를 분리할 수 있습니다.
+
+.시작하기 전에
+ONTAP Select 및 ONTAP Select Deploy 관리자 계정 자격 증명이 있어야 합니다.
+
+.단계
+. 관리자 계정을 사용하여 Deploy 유틸리티 웹 사용자 인터페이스에 로그인하십시오.
+. 페이지 상단의 *Clusters* 탭을 선택하고 목록에서 원하는 클러스터를 선택합니다.
+. 원하는 HA 쌍 또는 노드 옆에 있는 *+*를 선택합니다.
++
+해당 옵션이 비활성화된 경우 Deploy는 현재 스토리지 정보를 새로 고치고 있습니다.
+
+. *노드 스토리지 편집* 페이지에서 *스토리지 편집*을 선택합니다.
+. 노드에서 분리할 디스크를 선택 해제하고 ONTAP 관리자 자격 증명을 입력한 다음 *스토리지 편집*을 선택하여 변경 사항을 적용합니다.
+. 팝업 창에 표시되는 경고를 확인하려면 *예*를 선택합니다.
+. 클러스터의 *Events* 탭을 선택하여 분리 작업을 모니터링하고 확인하십시오.
++
+더 이상 필요하지 않은 경우 호스트에서 물리적 디스크를 제거할 수 있습니다.
+
+
+
+--
+.CLI를 사용한 KVM
+--
+디스크를 확인한 후에는 아래 단계를 따르십시오.
+
+.단계
+. 가상 머신에서 디스크를 분리합니다.
++
+.. 구성을 덤프합니다.
++
+[listing]
+----
+virsh dumpxml VMNAME > /PATH/disk.xml
+----
+.. 파일을 편집하여 가상 머신에서 분리할 디스크를 제외한 모든 내용을 제거하십시오.
++
+디스크의 대상 주소는 ONTAP의 vmdisk-target-address 필드와 일치해야 합니다.
+
++
+[listing]
+----
+<disk type='block' device='lun'>
+  <driver name='qemu' type='raw' cache='directsync'/>
+  <source dev='/dev/disk/by-id/ata- Micron_5100_MTFDDAK960TCC_171616D35277'/>
+  <backingStore/>
+  <target dev='sde' bus='scsi'/>
+  <alias name='scsi0-0-0-4'/>
+  <address type='drive' controller='0' bus='0' target='0' unit='4'/>
+</disk>
+----
+.. 디스크를 분리합니다.
++
+[listing]
+----
+virsh detach-disk --persistent /PATH/disk.xml
+----
+
+
+. 물리적 디스크를 교체하십시오.
++
+필요한 경우 `ledctl locate=`와 같은 유틸리티를 사용하여 물리적 디스크를 찾을 수 있습니다.
+
++
+.. 호스트에서 디스크를 제거하십시오.
+.. 새 디스크를 선택하고 필요한 경우 호스트에 설치하십시오.
+
+
+. 원래 디스크 구성 파일을 편집하고 새 디스크를 추가하십시오.
++
+필요에 따라 디스크 경로 및 기타 구성 정보를 업데이트해야 합니다.
+
++
+[listing]
+----
+<disk type='block' device='lun'>
+  <driver name='qemu' type='raw' cache='directsync'/>
+  <source dev='/dev/disk/by-id/ata-Micron_5100_MTFDDAK960TCC_171616D35277'/>
+  <backingStore/>
+  <target dev='sde' bus='scsi'/>
+  <alias name='scsi0-0-0-4'/>
+  <address type='drive' controller='0' bus='0' target='0' unit='4'/>
+</disk>
+----
+
+
+--
+.ESXi
+--
+.단계
+. 관리자 계정을 사용하여 Deploy 웹 사용자 인터페이스에 로그인하십시오.
+. *클러스터* 탭을 선택하고 해당 클러스터를 선택합니다.
++
+image:ST_22.jpg["노드 세부 정보"]
+
+. 스토리지 보기를 확장하려면 *+*를 선택하십시오.
++
+image:ST_23.jpg["노드 스토리지 편집"]
+
+. 연결된 디스크를 변경하려면 *편집*을 선택하고 오류가 발생한 드라이브의 선택을 해제하십시오.
++
+image:ST_24.jpg["스토리지 디스크 세부 정보"]
+
+. 클러스터 자격 증명을 입력하고 *Edit Storage*를 선택하십시오.
++
+image:ST_25.jpg["ONTAP 자격 증명"]
+
+. 작업을 확인하십시오.
++
+image:ST_26.jpg["경고"]
+
+
+
+--
+====
+
+
+[[add-the-new-spare-drive]]
+== 새 스페어 드라이브를 추가하세요
+
+고장난 드라이브를 제거한 후 스페어 디스크를 추가합니다.
+
+[role="tabbed-block"]
+====
+.Deploy를 사용하는 KVM
+--
+.Deploy를 사용하여 디스크 연결
+디스크를 교체하거나 스토리지 용량을 추가하기 위해 KVM 호스트에 디스크를 연결할 수 있습니다.
+
+.시작하기 전에
+ONTAP Select 및 ONTAP Select Deploy 관리자 계정 자격 증명이 있어야 합니다.
+
+새 디스크는 KVM Linux 호스트에 물리적으로 설치해야 합니다.
+
+.단계
+. 관리자 계정을 사용하여 Deploy 유틸리티 웹 사용자 인터페이스에 로그인하십시오.
+. 페이지 상단의 *Clusters* 탭을 선택하고 목록에서 원하는 클러스터를 선택합니다.
+. 원하는 HA 쌍 또는 노드 옆에 있는 *+*를 선택합니다.
++
+해당 옵션이 비활성화된 경우 Deploy는 현재 스토리지 정보를 새로 고치고 있습니다.
+
+. *노드 스토리지 편집* 페이지에서 *스토리지 편집*을 선택합니다.
+. 노드에 연결할 디스크를 선택하고 ONTAP 관리자 자격 증명을 입력한 다음 *스토리지 편집*을 선택하여 변경 사항을 적용합니다.
+. *Events* 탭을 선택하여 연결 작업을 모니터링하고 확인합니다.
+. 노드 스토리지 구성을 검사하여 디스크가 연결되어 있는지 확인하십시오.
+
+
+--
+.CLI를 사용한 KVM
+--
+고장난 드라이브를 찾아서 제거한 후 새 드라이브를 연결할 수 있습니다.
+
+.단계
+. 새 디스크를 가상 머신에 연결합니다.
++
+[listing]
+----
+virsh attach-disk --persistent /PATH/disk.xml
+----
+
+
+.결과
+해당 디스크는 스페어 디스크로 지정되어 ONTAP Select에서 사용할 수 있습니다. 디스크를 사용할 수 있게 되기까지 1분 이상 소요될 수 있습니다.
+
+.완료한 후
+노드 구성이 변경되었으므로 Deploy 관리 유틸리티를 사용하여 클러스터 새로 고침 작업을 수행해야 합니다.
+
+--
+.ESXi
+--
+.단계
+. 관리자 계정을 사용하여 Deploy 웹 사용자 인터페이스에 로그인하십시오.
+. *클러스터* 탭을 선택하고 해당 클러스터를 선택합니다.
++
+image:ST_27.jpg["HA 쌍"]
+
+. 스토리지 보기를 확장하려면 *+*를 선택하십시오.
++
+image:ST_28.jpg["노드 스토리지 편집"]
+
+. *편집*을 선택하고 새 드라이브가 사용 가능한지 확인한 후 선택하십시오.
++
+image:ST_29.jpg["스토리지 디스크 세부 정보"]
+
+. 클러스터 자격 증명을 입력하고 *Edit Storage*를 선택하십시오.
++
+image:ST_30.jpg["스토리지 디스크 세부 정보"]
+
+. 작업을 확인하십시오.
++
+image:ST_31.jpg["스토리지 디스크 세부 정보"]
+
+
+
+--
+====

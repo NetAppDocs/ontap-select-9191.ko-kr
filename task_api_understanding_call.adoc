@@ -1,0 +1,28 @@
+---
+sidebar: sidebar 
+permalink: task_api_understanding_call.html 
+keywords: rest api, deploy rest api, rest, understanding, executing 
+summary: 모든 API 호출에 대한 세부 정보는 ONTAP Select Deploy 온라인 문서 웹 페이지에서 공통 형식으로 문서화되어 표시됩니다. 하나의 API 호출을 이해하면 모든 API 호출의 세부 정보에 액세스하고 해석할 수 있습니다. 
+---
+= ONTAP Select Deploy API 호출을 이해하고 실행합니다
+:hardbreaks:
+:allow-uri-read: 
+:nofooter: 
+:icons: font
+:linkattrs: 
+:imagesdir: ./media/
+
+
+[role="lead"]
+모든 API 호출에 대한 세부 정보는 ONTAP Select Deploy 온라인 문서 웹 페이지에서 공통 형식으로 문서화되어 표시됩니다. 하나의 API 호출을 이해하면 모든 API 호출의 세부 정보에 액세스하고 해석할 수 있습니다.
+
+.시작하기 전에
+ONTAP Select Deploy 온라인 설명서 웹 페이지에 로그인해야 합니다. 클러스터가 생성될 때 ONTAP Select 클러스터에 할당된 고유 식별자가 있어야 합니다.
+
+.이 작업 정보
+고유 식별자를 사용하여 ONTAP Select 클러스터를 설명하는 구성 정보를 검색할 수 있습니다. 이 예에서는 비용이 저렴한 것으로 분류된 모든 필드가 반환됩니다. 하지만 최적의 결과를 얻으려면 필요한 특정 필드만 요청하는 것이 좋습니다.
+
+.단계
+. 기본 페이지 맨 아래로 스크롤하여 *Cluster*를 선택합니다.
+. *GET /clusters/{cluster_id}*를 선택하여 ONTAP Select 클러스터에 대한 정보를 반환하는 데 사용된 API 호출의 세부 정보를 표시합니다.
+

@@ -1,0 +1,131 @@
+---
+sidebar: sidebar 
+permalink: reference_plan_dep_vmware.html 
+keywords: plan, planning, ontap select deploy, vmware requirements 
+summary: VMware 환경에 ONTAP Select Deploy 유틸리티를 설치하기 전에 고려해야 할 VMware 환경 특유의 요구 사항 및 제한 사항이 몇 가지 있습니다. 
+---
+= ONTAP Select Deploy 하이퍼바이저 호스트 고려 사항
+:hardbreaks:
+:allow-uri-read: 
+:nofooter: 
+:icons: font
+:linkattrs: 
+:imagesdir: ./media/
+
+
+[role="lead"]
+고려해야 할 하이퍼바이저 호스트와 관련된 몇 가지 계획 문제가 있습니다.
+
+
+CAUTION: NetApp 지원팀의 지시가 없는 한 ONTAP Select 가상 머신의 구성을 직접 수정해서는 안 됩니다. 가상 머신은 배포 관리 유틸리티를 통해서만 구성하고 수정해야 합니다. NetApp 지원팀의 도움 없이 배포 유틸리티를 사용하지 않고 ONTAP Select 가상 머신을 변경하면 가상 머신이 오류를 일으켜 사용할 수 없게 될 수 있습니다.
+
+
+
+[[hypervisor-independent]]
+== 하이퍼바이저 독립적
+
+ONTAP Select와 ONTAP Select Deploy 관리 유틸리티는 모두 하이퍼바이저 독립적입니다.
+
+ONTAP Select 및 ONTAP Select Deploy 관리에는 다음 하이퍼바이저가 지원됩니다.
+
+* VMware ESXi
+* 커널 기반 가상 머신(KVM)
+
+
+
+NOTE: 지원되는 플랫폼에 대한 자세한 내용은 하이퍼바이저별 계획 정보 및 link:reference_release_notes.html["릴리스 노트"]를 참조하십시오.
+
+.ONTAP Select 노드 및 관리 유틸리티용 하이퍼바이저
+Deploy 관리 유틸리티와 ONTAP Select 노드는 모두 가상 머신으로 실행됩니다. Deploy 유틸리티에 사용할 하이퍼바이저는 ONTAP Select 노드에 사용할 하이퍼바이저와 독립적입니다. 이 둘을 페어링할 때 완벽한 유연성을 누릴 수 있습니다:
+
+* VMware ESXi에서 실행되는 Deploy 유틸리티는 VMware ESXi 또는 KVM에서 ONTAP Select 클러스터를 생성하고 관리할 수 있습니다.
+* KVM에서 실행되는 Deploy 유틸리티는 VMware ESXi 또는 KVM에서 ONTAP Select 클러스터를 생성하고 관리할 수 있습니다.
+
+
+.호스트당 하나 이상의 ONTAP Select 노드 인스턴스
+각 ONTAP Select 노드는 전용 가상 머신으로 실행됩니다. 동일한 하이퍼바이저 호스트에 여러 노드를 생성할 수 있지만 다음과 같은 제한 사항이 있습니다:
+
+* 하나의 ONTAP Select 클러스터에 속한 여러 노드가 동일한 호스트에서 실행될 수 없습니다. 특정 호스트에 있는 모든 노드는 서로 다른 ONTAP Select 클러스터에 속해야 합니다.
+* 외부 스토리지를 사용해야 합니다.
+* 소프트웨어 RAID를 사용하는 경우 호스트에 ONTAP Select 노드를 하나만 배포할 수 있습니다.
+
+
+.클러스터 내 노드에 대한 하이퍼바이저 일관성
+ONTAP Select 클러스터 내의 모든 호스트는 동일한 버전 및 릴리스의 하이퍼바이저 소프트웨어를 실행해야 합니다.
+
+.각 호스트의 물리적 포트 수
+각 호스트가 하나, 둘 또는 네 개의 물리적 포트를 사용하도록 구성해야 합니다. 네트워크 포트 구성에는 유연성이 있지만, 가능한 한 다음 권장 사항을 따르십시오.
+
+* 단일 노드 클러스터의 호스트에는 두 개의 물리적 포트가 있어야 합니다.
+* 다중 노드 클러스터의 각 호스트에는 4개의 물리적 포트가 있어야 합니다.
+
+
+.ONTAP Select를 ONTAP 하드웨어 기반 클러스터와 통합하십시오
+ONTAP Select 노드를 ONTAP 하드웨어 기반 클러스터에 직접 추가할 수는 없습니다. 하지만 선택적으로 ONTAP Select 클러스터와 하드웨어 기반 ONTAP 클러스터 간에 클러스터 피어링 관계를 설정할 수 있습니다.
+
+
+
+[[vmware-hypervisor-environment]]
+== VMware 하이퍼바이저 환경
+
+VMware 환경에 ONTAP Select Deploy 유틸리티를 설치하기 전에 고려해야 할 VMware 환경 특유의 요구 사항 및 제한 사항이 몇 가지 있습니다.
+
+.ESXi 호스트 서버 하드웨어 요구 사항
+ESXi 하이퍼바이저 호스트는 몇 가지 최소 리소스 요구 사항을 충족해야 합니다. ONTAP Select가 배포된 호스트가 다음 기본 요구 사항을 충족하는지 확인하십시오.
+
+* ESXi 서버:
++
+** 하드웨어와 소프트웨어는 64비트여야 합니다
+** ONTAP Select 노드에 정의된 지원 버전과 동일한 버전을 준수해야 합니다
+
+
+* 가상 CPU(2)
+* 가상 메모리(4GB)
+* 스토리지(40GB)
+* DHCP 활성화(고정 IP 주소도 할당 가능)
+
+
+.네트워크 연결
+ONTAP Select Deploy 가상 머신 네트워크 인터페이스가 구성되어 있고 단일 관리 IP 주소를 가지고 있는지 확인합니다. DHCP를 사용하여 IP 주소를 동적으로 할당하거나 고정 IP 주소를 수동으로 구성할 수 있습니다.
+
+배포 방식에 따라 배포 VM은 vCenter 서버, ESXi 하이퍼바이저 호스트 및 관리하는 ONTAP Select 노드에 연결할 수 있어야 합니다. 필요한 트래픽을 허용하도록 방화벽을 구성해야 합니다.
+
+Deploy는 VMware VIX API를 사용하여 vCenter 서버 및 ESXi 호스트와 통신합니다. 처음에는 TCP 포트 443에서 SSL을 통한 SOAP 연결을 설정합니다. 그 후, 포트 902에서 SSL을 사용하여 연결을 엽니다. 또한 Deploy는 PING 명령을 실행하여 사용자가 지정한 IP 주소에 ESXi 호스트가 있는지 확인합니다.
+
+또한 Deploy는 다음 프로토콜을 사용하여 ONTAP Select 노드 및 클러스터 관리 IP 주소와 통신할 수 있어야 합니다.
+
+* PING 명령(ICMP)
+* SSH(포트 22)
+* SSL(포트 443)
+
+
+.IP 버전 4 지원
+ONTAP Select Deploy는 IP 버전 4(IPv4)만 지원합니다. IP 버전 6(IPv6)은 지원되지 않습니다. 이러한 제한 사항은 다음과 같은 방식으로 ONTAP Select에 영향을 미칩니다.
+
+* Deploy 가상 머신의 관리 LIF에 IPv4 주소를 할당해야 합니다.
+* Deploy는 ONTAP LIF에서 IPv6를 사용하도록 구성된 ONTAP Select 노드를 생성할 수 없습니다.
+
+
+
+
+[[vmware-vcenter-server-considerations]]
+== VMware vCenter 서버 고려 사항
+
+.ESA용 VMware vSphere 권한
+vCenter에서 vSAN Express Storage Architecture(ESA)를 생성하고 관리하려면 다음과 같은 vSphere 콘텐츠 라이브러리 권한이 필요합니다.
+
+
+NOTE: 콘텐츠 라이브러리 권한에 액세스하려면 관리자가 vCenter Server의 전역 권한에 대한 액세스 권한을 부여해야 합니다.
+
+* 라이브러리 항목 추가
+* 로컬 라이브러리 생성
+* 라이브러리 항목 삭제
+* 로컬 라이브러리 삭제
+* 파일 다운로드
+* 스토리지 읽기
+* 파일 업데이트
+* 라이브러리 업데이트
+* 라이브러리 항목 업데이트
+* 로컬 라이브러리 업데이트
+* 구성 설정 보기
+

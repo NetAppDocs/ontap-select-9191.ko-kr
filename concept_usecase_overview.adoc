@@ -1,0 +1,66 @@
+---
+sidebar: sidebar 
+permalink: concept_usecase_overview.html 
+keywords: ontap select, business use case overview, deployment, storage, development and testing 
+summary: ONTAP Select는 하이퍼바이저 가상화를 통해 제공되는 고유한 유연성을 기반으로 여러 가지 유형의 애플리케이션에 적합합니다. 
+---
+= ONTAP Select 비즈니스 요구 사항 및 사용 시나리오
+:hardbreaks:
+:allow-uri-read: 
+:nofooter: 
+:icons: font
+:linkattrs: 
+:imagesdir: ./media/
+
+
+[role="lead"]
+ONTAP Select는 하이퍼바이저 가상화를 통해 제공되는 고유한 유연성을 기반으로 여러 가지 유형의 애플리케이션에 적합합니다.
+
+
+
+[[deployment]]
+== 구축
+
+크게 보면 하이퍼바이저 호스트 서버의 워크로드 측면에서 ONTAP Select를 배포하는 방법은 두 가지가 있습니다.
+
+
+
+[[dedicated-deployment]]
+=== 전용 배포
+
+전용 배포 모델을 사용하면 호스트 서버에서 ONTAP Select의 단일 인스턴스가 실행됩니다. 동일한 하이퍼바이저 호스트에서 다른 중요한 처리 작업은 실행되지 않습니다.
+
+
+
+[[collocated-deployment]]
+=== 배치된 배포
+
+공동 배치 배포 모델에서 ONTAP Select는 다른 워크로드와 호스트를 공유합니다. 구체적으로, 일반적으로 컴퓨팅 애플리케이션을 실행하는 추가 가상 머신이 있습니다. 이러한 컴퓨팅 워크로드는 ONTAP Select 클러스터에 로컬로 존재합니다. 이 모델은 특수 애플리케이션 및 배포 요구 사항을 지원합니다. 전용 배포 모델과 마찬가지로 각 ONTAP Select 가상 머신은 별도의 전용 하이퍼바이저 호스트에서 실행되어야 합니다.
+
+
+
+[[storage]]
+== 스토리지
+
+ONTAP Select는 비즈니스 요구 사항에 따라 운영 스토리지 또는 2차 스토리지로 사용할 수 있습니다.
+
+
+
+[[primary-storage]]
+=== 운영 스토리지
+
+특정 상황에서는 ONTAP Select를 기본 스토리지 플랫폼으로 배포하도록 선택할 수 있습니다. 이러한 구현 유형은 다양하며 애플리케이션의 워크로드 특성과 비즈니스 목표에 따라 달라집니다.
+
+
+
+[[disaster-recovery-and-secondary-storage]]
+=== 재해 복구 및 2차 스토리지
+
+ONTAP Select를 사용하여 기본 스토리지 용량을 보강하는 추가 스토리지를 구현할 수 있습니다. 추가 스토리지는 조직의 재해 복구 및 데이터 백업 계획을 지원하는 데 사용할 수 있습니다.
+
+
+
+[[development-and-testing]]
+== 개발 및 테스트
+
+조직 내에서 다양한 애플리케이션을 배포할 때 ONTAP Select를 전체 애플리케이션 개발 및 테스트 프로세스의 필수적인 부분으로 활용할 수 있습니다. 예를 들어 테스트 입력 또는 출력 데이터를 저장하기 위한 임시 스토리지가 필요할 수 있습니다. 이러한 유형의 배포 기간은 애플리케이션의 특성과 요구 사항에 따라 달라질 수 있습니다.

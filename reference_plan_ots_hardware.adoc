@@ -1,0 +1,143 @@
+---
+sidebar: sidebar 
+permalink: reference_plan_ots_hardware.html 
+keywords: plan, planning, vmware, hardware, hardware requirements 
+summary: VMware 환경과 관련하여 고려해야 할 하드웨어 요구 사항 및 계획 문제가 몇 가지 있습니다. 
+---
+= ONTAP Select VMware 하이퍼바이저 및 하드웨어 고려 사항
+:hardbreaks:
+:allow-uri-read: 
+:nofooter: 
+:icons: font
+:linkattrs: 
+:imagesdir: ./media/
+
+
+[role="lead"]
+VMware 환경과 관련하여 고려해야 할 하드웨어 요구 사항 및 계획 문제가 몇 가지 있습니다.
+
+
+
+[[hypervisor-requirements]]
+== 하이퍼바이저 요구사항
+
+ONTAP Select가 실행되는 하이퍼바이저와 관련된 몇 가지 요구 사항이 있습니다.
+
+
+NOTE: link:reference_release_notes.html["ONTAP Select 릴리스 정보"]에서 추가적인 알려진 제한 사항이나 한계가 있는지 검토해야 합니다.
+
+
+
+[[vmware-licensing]]
+=== VMware 라이센스
+
+ONTAP Select 클러스터를 배포하려면 조직에 ONTAP Select가 실행되는 하이퍼바이저 호스트에 대한 유효한 VMware vSphere 라이센스가 있어야 합니다. 배포에 적합한 라이센스를 사용해야 합니다.
+
+
+
+[[software-compatibility]]
+=== 소프트웨어 호환성
+
+KVM 및 ESXi 하이퍼바이저에 ONTAP Select를 구축할 수 있습니다.
+
+[role="tabbed-block"]
+====
+.KVM
+--
+ONTAP Select는 다음 KVM 하이퍼바이저 버전을 지원합니다.
+
+* Red Hat Enterprise Linux(RHEL) 10.1, 10.0, 9.7, 9.6, 9.5, 9.4, 9.2, 9.1, 9.0, 8.8, 8.7 및 8.6의 KVM
+* Rocky Linux 10.1, 10.0, 9.7, 9.6, 9.5, 9.4, 9.3, 9.2, 9.1, 9.0, 8.9, 8.8, 8.7 및 8.6의 KVM
+
+
+--
+.ESXi
+--
+ONTAP Select는 다음 ESXi 하이퍼바이저 버전을 지원합니다.
+
+* VMware ESXi 9.0
+* VMware ESXi 8.0 U3
+* VMware ESXi 8.0 U2
+* VMware ESXi 8.0 U1(빌드 21495797)
+* VMware ESXi 8.0 GA(빌드 20513097)
+
+
+
+NOTE: NetApp은 VMware에서도 동일한 버전을 계속 지원하는 한, 지정된 ESXi 버전에서 ONTAP Select를 지원합니다.
+
+
+NOTE: ESXi 7.0 GA가 가용성 종료 상태에 도달했습니다. 이 버전의 ONTAP Select 클러스터가 있는 경우 https://mysupport.netapp.com/matrix["상호 운용성 매트릭스 툴(IMT)"^]에 따라 지원되는 버전으로 업그레이드해야 합니다.
+
+--
+====
+
+
+[[vmware-vcenter-and-standalone-esxi-hosts]]
+=== VMware vCenter 및 독립형 ESXi 호스트
+
+ESXi 하이퍼바이저 호스트가 vCenter 서버에서 관리되는 경우 vCenter 자격 증명을 사용하여 해당 호스트를 Deploy 관리 유틸리티에 등록해야 합니다. ESXi 자격 증명을 사용하여 해당 호스트를 독립 실행형 호스트로 등록할 수는 없습니다.
+
+
+
+[[core-hardware-requirements]]
+== 핵심 하드웨어 요구사항
+
+ONTAP Select를 구축하는 물리적 하이퍼바이저 호스트는 몇 가지 하드웨어 요구 사항을 충족해야 합니다. 최소 하드웨어 요구 사항만 충족한다면 어떤 플랫폼이든 하이퍼바이저 호스트로 선택할 수 있습니다. 지원되는 하드웨어 플랫폼을 제공하는 공급업체는 Cisco, Dell, HP, Fujitsu, Lenovo 및 Supermicro입니다.
+
+ONTAP Select는 Intel Xeon Sandy Bridge 및 Advanced Micro Devices(AMD) 프로세서 기반 CPU 모델을 지원합니다.
+
+자세한 내용은 https://mysupport.netapp.com/matrix["상호운용성 매트릭스 도구"^]를 참조하십시오.
+
+
+
+[[basic-hardware-requirements]]
+=== 기본 하드웨어 요구 사항
+
+노드 인스턴스 유형이나 라이센스 제공과 관계없이 모든 플랫폼에 적용되는 몇 가지 공통 하드웨어 요구 사항이 있습니다.
+
+.프로세서
+지원되는 마이크로프로세서에는 Intel Xeon 서버 프로세서와 AMD 프로세서가 포함됩니다.
+
+자세한 내용은 link:https://www.intel.com/content/www/us/en/products/processors/xeon/view-all.html?Processor+Type=1003["Intel Xeon 프로세서"^] 및 link:https://www.amd.com/en/products/processors/server/epyc.html["AMD EPYC 서버 CPU"^]을 참조하십시오.
+
+.이더넷 구성
+클러스터 크기에 따라 지원되는 이더넷 구성이 여러 가지 있습니다.
+
+[cols="2,3,3"]
+|===
+| 클러스터 크기 | 최소 요구 사항 | 권장 요구사항 
+
+
+| 단일 노드 클러스터 | 2 x 1GbE | 2 x 10GbE 
+
+
+| 2노드 클러스터 또는 MetroCluster SDS | 4 x 1GbE 또는 1 x 10GbE | 2 x 10GbE 
+
+
+| 4개, 6개, 8개, 10개 또는 12개 노드 클러스터 | 2 x 10GbE | 4 x 10GbE 또는 2 x 25/40GbE 
+|===
+
+
+[[additional-hardware-requirements-based-on-the-instance-type]]
+=== 인스턴스 유형에 따른 추가 하드웨어 요구 사항
+
+노드 인스턴스 유형에 따라 몇 가지 추가 하드웨어 요구 사항이 있습니다.
+
+[cols="a1,a2,a2,a2"]
+|===
+| 노드 크기 | CPU 코어 | 메모리 | 필수 플랫폼 라이센스 제공 
+
+
+| 소형 | 6개 이상의 물리적 코어(그중 4개는 ONTAP Select용으로 예약됨) | 24GB 이상, ONTAP Select용으로 16GB 예약 | Standard, Premium 또는 Premium XL 
+
+
+| 중간 | 10개 이상의 물리적 코어(그중 8개는 ONTAP Select용으로 예약됨) | 72GB 이상, ONTAP Select용으로 64GB 예약 | Premium 또는 Premium XL 
+
+
+| 대형 | 18개 이상의 물리적 코어 중 16개는 ONTAP Select용으로 예약됨 | 136GB 이상, ONTAP Select용으로 128GB 예약 | 프리미엄 XL 
+|===
+
+NOTE: 플랫폼 라이센스에 따라 추가 디스크 요구 사항이 있습니다. 자세한 내용은 link:reference_plan_ots_storage.html["스토리지 및 RAID"]을(를) 참조하십시오.
+
+.관련 정보
+link:concept_lic_platforms.html["ONTAP Select의 플랫폼 라이센스 오퍼링"]에 대해 알아보십시오

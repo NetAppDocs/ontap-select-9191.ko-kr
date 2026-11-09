@@ -1,0 +1,111 @@
+---
+sidebar: sidebar 
+permalink: concept_terminology.html 
+keywords: terminology, key concepts, concepts 
+summary: ONTAP Select를 살펴보고 배포 계획을 세우기 시작할 때 먼저 용어와 주요 개념을 숙지하는 것이 도움이 됩니다. 
+---
+= ONTAP Select 용어 및 핵심 개념
+:hardbreaks:
+:allow-uri-read: 
+:nofooter: 
+:icons: font
+:linkattrs: 
+:imagesdir: ./media/
+
+
+[role="lead"]
+ONTAP Select를 살펴보고 배포 계획을 세우기 시작할 때 먼저 용어와 주요 개념을 숙지하는 것이 도움이 됩니다.
+
+ONTAP Select Deploy:: ONTAP Select Deploy는 ONTAP Select 클러스터를 배포하는 데 사용하는 관리 유틸리티입니다. Deploy 유틸리티는 전용 Linux 가상 머신에서 실행됩니다. 웹 사용자 인터페이스, CLI 관리 셸 및 REST API를 통해 Deploy 유틸리티에 액세스할 수 있습니다.
+커널 기반 가상 머신:: 커널 기반 가상 머신(KVM)은 Linux 커널의 가상화 기능으로, 하이퍼바이저 플랫폼 역할을 할 수 있도록 해줍니다. 다양한 게스트 운영 체제가 지원됩니다.
+하이퍼바이저 호스트와 ONTAP Select 노드:: _하이퍼바이저 호스트_는 ONTAP Select 가상 머신을 호스팅하는 핵심 하드웨어 플랫폼입니다. ONTAP Select 가상 머신이 하이퍼바이저 호스트에 배포되어 활성화되면 해당 가상 머신은 _ONTAP Select 노드_로 간주됩니다.
+ONTAP Select 클러스터:: 1개, 2개, 4개, 6개, 8개, 10개 또는 12개의 노드로 구성된 _ONTAP Select 클러스터_를 생성할 수 있습니다. 다중 노드 클러스터는 항상 하나 이상의 HA 쌍을 포함합니다. 예를 들어, 4개 노드 클러스터는 두 개의 HA 쌍으로 구성됩니다. 단일 노드 클러스터는 HA 기능을 제공하지 않습니다.
+하이퍼바이저 호스트 환경 준비:: ONTAP Select 클러스터를 배포하기 위해 Deploy 관리 유틸리티를 사용하기 전에 ONTAP Select가 실행될 하이퍼바이저 호스트(스토리지 및 네트워킹 환경 포함)를 준비해야 합니다. 이러한 호스트 사전 구성은 현재 요구 사항 및 제한 사항에 따라 ONTAP Select 제품 외부에서 수행됩니다.
+평가 배포와 운영 배포 비교:: 모든 ONTAP Select 노드는 _평가판 라이센스_ 또는 _구매 라이센스_ 중 하나로 실행됩니다. 평가판 라이센스를 사용하면 운영 환경에 배포하기 전에 ONTAP Select를 평가할 수 있습니다. 평가판 라이센스는 자동으로 생성되어 적용됩니다. 운영 환경에 클러스터를 배포하는 경우 다음을 선택하여 라이센스를 구매해야 합니다.
++
+--
+* 라이센스 모델
+* 스토리지 용량
+* 플랫폼 라이센스 제공
+
+
+--
+용량 계층 라이센스 모델:: Capacity Tiers 라이센스 모델은 ONTAP Select 구축 환경에서 스토리지 라이센스를 부여할 때 사용되는 기본 옵션입니다. 이는 NetApp AFF 및 FAS에서 사용되는 ONTAP 모델을 기반으로 합니다. 각 노드마다 별도의 라이센스가 필요합니다. 스토리지 용량은 노드에 고정되어 영구적으로 사용할 수 있습니다(갱신 필요 없음).
+Capacity Pools 라이센스 모델:: 용량 풀 라이센스 모델은 Deploy 2.10을 사용하는 ONTAP Select 9.5에서 도입되었습니다. 각 스토리지 용량 풀마다 별도의 라이센스가 필요합니다. 용량 풀 라이센스는 License Manager 인스턴스(즉, Deploy 인스턴스)에 고정되며 구매 조건에 따라 갱신해야 합니다. 조직 내에서 원하는 만큼 용량 풀 라이센스를 취득하여 사용할 수 있습니다. 하지만 용량 풀은 ONTAP Select 노드에서 공유되므로 일반적으로 용량 계층 라이센스보다 적은 수의 라이센스가 필요합니다.
+라이센스 관리자:: License Manager는 Capacity Pools 라이센스를 지원하는 소프트웨어 구성 요소입니다. 현재 Deploy 관리 유틸리티의 일부입니다. LM은 관리하는 공유 풀에서 ONTAP Select 노드에 스토리지를 임대합니다. _License Lock ID_는 각 LM 인스턴스, 즉 각 Deploy 인스턴스를 고유하게 식별하는 숫자 문자열입니다. 라이센스 파일을 생성하려면 Capacity Pool 라이센스 일련 번호와 LLID를 모두 사용해야 합니다.
+플랫폼 라이센스 서비스:: 라이센스를 구매할 때 ONTAP Select 가상 머신의 크기 기능을 결정하는 세 가지 라이센스 제공 유형이 있습니다.
++
+--
+* 표준
+* 프리미엄
+* 프리미엄 XL
+
+
+--
+
+
+자세한 내용은 두 섹션 link:concept_workflow_deploy.html["계획"] 및 link:concept_lic_evaluation.html["라이센스"]을 참조하십시오.
+
+스토리지 풀과 데이터 저장소 비교:: ONTAP Select _스토리지 풀_은 기본 물리적 스토리지를 추상화하고 숨기도록 설계된 논리적 데이터 컨테이너입니다. 스토리지 풀은 하이퍼바이저에 독립적입니다. ESXi 하이퍼바이저 호스트에 배포될 경우 ONTAP Select 스토리지 풀은 VMware _datastore_와 동일합니다.
+클러스터 MTU:: 클러스터 MTU는 ONTAP Select 다중 노드 클러스터에서 사용되는 내부 네트워크에서 사용되는 MTU 크기를 구성할 수 있는 기능입니다. Deploy 관리 유틸리티는 HA 쌍을 구성할 때 네트워킹 환경에 맞게 MTU 크기를 조정합니다. 값을 수동으로 설정할 수도 있습니다.
+ONTAP Select vNAS:: ONTAP Select vNAS 솔루션을 사용하면 ONTAP Select 노드가 외부 스토리지의 VMware 데이터스토어에 액세스할 수 있습니다. ONTAP Select vNAS를 사용하면 로컬 RAID 컨트롤러가 더 이상 필요하지 않으며, RAID 기능은 원격 스토리지에서 제공됩니다. ONTAP Select vNAS는 다음과 같은 방식으로 구성할 수 있습니다.
++
+--
+* VMware vSAN
+* 범용 외부 스토리지 어레이
+
+
+--
+
+
+두 경우 모두 ONTAP Select 클러스터를 생성하거나 기존 노드의 스토리지 용량을 확장하기 전에 외부 스토리지를 구성해야 합니다.
+
+ESXi VM에서 노드 재호스팅:: ONTAP Select vNAS 솔루션(VMware vSAN 또는 일반 외부 스토리지 어레이)을 통해 사용할 수 있는 외부 스토리지를 사용하는 클러스터를 배포할 때 ONTAP Select 노드를 호스팅하는 ESXi 가상 머신은 다음 VMware 기능을 활용하여 이동할 수 있습니다:
++
+--
+* vMotion
+* 고가용성(HA)
+* DRS(Distributed Resource Scheduler)
++
+ONTAP Select Deploy 유틸리티는 다음과 같이 클러스터에서 작업을 실행하는 과정에서 가상 머신의 이동을 감지합니다.
+
+* 클러스터 온라인
+* 클러스터 오프라인
+* 스토리지 추가
++
+가상 머신을 이동하면 Deploy 유틸리티가 내부 데이터베이스를 업데이트하고 새 ESXi 호스트를 구성합니다. 가상 머신 이동 및 Deploy 업데이트가 완료될 때까지 ONTAP Select 노드에서 수행되는 모든 작업이 차단됩니다.
+
+
+
+--
+KVM용 Open vSwitch:: Open vSwitch(OVS)는 다양한 네트워킹 프로토콜을 지원하는 가상 스위치의 소프트웨어 구현체입니다. OVS는 오픈 소스이며 Apache License 2.0에 따라 사용할 수 있습니다.
+중재자 서비스:: ONTAP Select Deploy 유틸리티에는 활성 2노드 클러스터의 노드에 연결하는 중재자 서비스가 포함되어 있습니다. 이 서비스는 각 HA 쌍을 모니터링하고 장애 관리를 지원합니다.
+
+
+
+CAUTION: 활성 상태인 2노드 클러스터가 하나 이상 있는 경우, 해당 클러스터를 관리하는 ONTAP Select Deploy 가상 머신은 항상 실행 중이어야 합니다. Deploy 가상 머신이 중지되면 중재자 서비스를 사용할 수 없게 되어 2노드 클러스터의 HA 기능이 손실됩니다.
+
+MetroCluster SDS:: MetroCluster SDS는 2노드 ONTAP Select 클러스터를 구축할 때 추가 구성 옵션을 제공하는 기능입니다. 일반적인 2노드 ROBO 구축과 달리 MetroCluster SDS 노드는 훨씬 더 먼 거리에 배치할 수 있습니다. 이러한 물리적 분리를 통해 재해 복구와 같은 추가적인 사용 사례를 구현할 수 있습니다. MetroCluster SDS를 사용하려면 프리미엄 라이센스 이상이 필요합니다. 또한 노드 간 네트워크는 최소 지연 시간 요구 사항을 충족해야 합니다.
+자격 증명 저장소:: Deploy 자격 증명 저장소는 계정 자격 증명을 보유하는 보안 데이터베이스입니다. 주로 새 클러스터 생성 과정에서 하이퍼바이저 호스트를 등록하는 데 사용됩니다. 자세한 내용은 link:concept_workflow_deploy.html["계획"] 섹션을 참조하십시오.
+스토리지 효율성:: ONTAP Select는 FAS 및 AFF 어레이에서 제공되는 것과 유사한 스토리지 효율성 옵션을 제공합니다. 개념적으로, 프리미엄 라이센스를 사용하는 DAS(Direct-Attached Storage) SSD 구성의 ONTAP Select는 AFF 어레이와 유사합니다. HDD를 사용하는 DAS 구성 및 모든 vNAS 구성은 FAS 어레이와 유사하다고 볼 수 있습니다. 두 구성의 주요 차이점은 DAS SSD를 사용하는 ONTAP Select가 인라인 애그리게이트 레벨 중복 제거 및 애그리게이트 레벨 백그라운드 중복 제거를 지원한다는 점입니다. 나머지 스토리지 효율성 옵션은 두 구성 모두에서 사용할 수 있습니다.
++
+--
+vNAS 기본 구성에서는 SIDL(단일 인스턴스 데이터 로깅)이라는 쓰기 최적화 기능을 활성화합니다. ONTAP Select 9.6 이상 릴리스에서는 SIDL이 활성화된 상태에서 백그라운드 ONTAP 스토리지 효율성 기능이 검증됩니다. 자세한 내용은 link:concept_stor_concepts_chars.html["심층 분석"] 섹션을 참조하십시오.
+
+--
+클러스터 새로 고침:: 클러스터를 생성한 후 Deploy 유틸리티 외부에서 ONTAP 또는 하이퍼바이저 관리 툴을 사용하여 클러스터 또는 가상 머신 구성을 변경할 수 있습니다. 또한 가상 머신을 마이그레이션하면 구성 변경이 발생할 수 있습니다. 이러한 변경이 발생하면 Deploy 유틸리티가 자동으로 업데이트되지 않아 클러스터 상태와 동기화되지 않을 수 있습니다. 클러스터 새로 고침 기능을 사용하여 Deploy 구성 데이터베이스를 업데이트할 수 있습니다. 클러스터 새로 고침은 Deploy 웹 사용자 인터페이스, CLI 관리 셸 및 REST API를 통해 사용할 수 있습니다.
+소프트웨어 RAID:: DAS(Direct-Attached Storage)를 사용할 때 RAID 기능은 일반적으로 로컬 하드웨어 RAID 컨트롤러를 통해 제공됩니다. 하지만 ONTAP Select 노드에서 RAID 기능을 제공하는 _소프트웨어 RAID_를 사용하도록 노드를 구성할 수도 있습니다. 소프트웨어 RAID를 사용하면 하드웨어 RAID 컨트롤러가 더 이상 필요하지 않습니다.
+
+
+[[ontap-select-image-install]]
+ONTAP Select 이미지 설치:: Deploy 관리 유틸리티에는 ONTAP Select의 단일 버전만 포함되어 있습니다. 포함된 버전은 릴리스 시점에 사용 가능한 최신 버전입니다. ONTAP Select 이미지 설치 기능을 사용하면 이전 버전의 ONTAP Select를 Deploy 유틸리티 인스턴스에 추가할 수 있으며, ONTAP Select 클러스터를 배포할 때 사용할 수 있습니다. link:task_cli_deploy_image_add.html["자세한 내용은 ONTAP Select 이미지를 추가하십시오"]를 참조하십시오.
+
+
+
+NOTE: Deploy 인스턴스에 포함된 원래 버전보다 이전 버전의 ONTAP Select 이미지만 추가해야 합니다. Deploy를 업데이트하지 않고 이후 버전의 ONTAP Select를 추가하는 것은 지원되지 않습니다.
+
+ONTAP Select 클러스터 배포 후 관리:: ONTAP Select 클러스터를 배포한 후에는 하드웨어 기반 ONTAP 클러스터와 마찬가지로 클러스터를 구성할 수 있습니다. 예를 들어, System Manager 또는 표준 ONTAP 명령줄 인터페이스를 사용하여 ONTAP Select 클러스터를 구성할 수 있습니다.
+
+
+.관련 정보
+link:task_cli_deploy_image_add.html["Deploy에 ONTAP Select 이미지 추가"]

@@ -1,0 +1,76 @@
+---
+sidebar: sidebar 
+permalink: concept_lic_evaluation.html 
+keywords: license, licensing, evaluation, upgrade license 
+summary: ONTAP Select를 구매하기로 결정하기 전에 평가하려는 경우 평가판 라이센스를 사용할 수 있습니다. 평가판 라이센스는 ONTAP Select Deploy 관리 유틸리티에 포함되어 있으며 평가 배포의 일부로 각 ONTAP Select 노드에 자동으로 적용됩니다. 
+---
+= ONTAP Select 구축을 위한 평가판 라이센스에 대해 알아보십시오
+:hardbreaks:
+:allow-uri-read: 
+:nofooter: 
+:icons: font
+:linkattrs: 
+:imagesdir: ./media/
+
+
+[role="lead"]
+평가판 라이센스 또는 구매한 라이센스를 사용하여 ONTAP Select를 배포할 수 있습니다. 선택한 라이센스는 ONTAP Select 클러스터의 각 노드, 즉 전체 클러스터에 적용되어야 합니다. ONTAP Select를 구매하기로 결정하기 전에 평가하려는 경우 평가판 라이센스를 사용할 수 있습니다. 평가판 라이센스는 ONTAP Select Deploy 관리 유틸리티에 포함되어 있으며 평가 배포의 일부로 각 ONTAP Select 노드에 자동으로 적용됩니다.
+
+[NOTE]
+====
+ONTAP Select Deploy 관리 유틸리티를 다운로드하려면 다음이 필요합니다.
+
+* 등록된 NetApp Support Site 계정. 계정이 없는 경우  https://mysupport.netapp.com/site/user/registration["사용자 등록"^]을(를) 참조하십시오.
+*  https://mysupport.netapp.com/site/downloads/evaluation/ontap-select["최종 사용자 라이센스 계약에 동의합니다"^]평가판 라이센스를 사용하여 ONTAP Select 배포를 하려면 다음 단계를 따르십시오.
+
+
+====
+평가 클러스터를 배포하고 지원할 때 고려해야 할 사항은 여러 가지가 있습니다.
+
+* 클러스터는 평가 목적으로만 사용할 수 있습니다. 운영 환경에서 평가 라이센스가 있는 클러스터를 사용해서는 안 됩니다.
+* 각 호스트를 구성할 때는 다음과 같이 ONTAP Select Deploy 관리 유틸리티를 사용해야 합니다.
++
+** 일련 번호를 제공하지 마십시오
+** 평가판 라이센스를 사용하도록 구성하십시오
+
+
+
+
+
+
+[[licensing-characteristics]]
+== 라이센스 특성
+
+ONTAP Select 평가판 라이센스는 다음과 같은 특징을 가지고 있습니다.
+
+* 스토리지 용량이 있는 운영 라이센스는 필요하지 않습니다
+* 노드 일련 번호는 20자리 숫자이며 ONTAP Select Deploy에서 자동으로 생성됩니다.
++
+(NetApp에서 직접 구입하지 않음)
+
+* 라이센스에서 제공하는 평가 기간은 최대 90일입니다.
+* 각 노드에 할당되는 최대 스토리지 용량은 운영 라이센스와 동일합니다
+
+
+
+
+[[upgrade-to-a-production-license]]
+== 운영 라이센스로 업그레이드하십시오
+
+ONTAP Select 평가판 클러스터를 업그레이드하여 운영 라이센스를 사용할 수 있습니다. 다음 제한 사항에 유의해야 합니다.
+
+* 라이센스 업그레이드를 수행하려면 Deploy 관리 유틸리티를 사용해야 합니다
+* 용량 계층 라이센스는 사용할 수 있지만, 용량 풀 라이센스는 지원되지 않습니다.
+* 각 노드에는 클러스터 크기에 따라 운영 라이센스에 필요한 최소 용량을 지원할 수 있도록 충분한 스토리지가 할당되어야 합니다
+
+
+자세한 내용은 link:task_adm_licenses.html["평가판 라이센스를 프로덕션 라이센스로 전환"]을(를) 참조하십시오.
+
+.다음 단계
+* link:access-evaluation-software.html["ONTAP Select 평가 소프트웨어에 액세스합니다"]
+* link:deploy-evaluation-ontap-select-ovf-template.html["ONTAP Select 클러스터의 90일 평가판 인스턴스 배포"]
+
+
+.관련 정보
+* link:concept_lic_production.html["운영 환경 배포를 위한 라이센스에 대해 알아보십시오"]
+

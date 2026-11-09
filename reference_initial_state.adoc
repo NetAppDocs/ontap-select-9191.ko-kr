@@ -1,0 +1,54 @@
+---
+sidebar: sidebar 
+permalink: reference_initial_state.html 
+keywords: install, installing, initial state, cluster initial state 
+summary: 클러스터가 배포된 후 초기 상태를 파악하고 환경에 맞게 클러스터를 구성해야 합니다. 
+---
+= 배포 후 ONTAP Select 클러스터의 초기 상태
+:hardbreaks:
+:allow-uri-read: 
+:nofooter: 
+:icons: font
+:linkattrs: 
+:imagesdir: ./media/
+
+
+[role="lead"]
+클러스터가 배포된 후 초기 상태를 파악하고 환경에 맞게 클러스터를 구성해야 합니다.
+
+ONTAP Select 클러스터는 생성 후 몇 가지 특성을 갖습니다.
+
+
+NOTE: ONTAP 관리자 계정에 대한 역할 및 권한을 제한하면 ONTAP Select Deploy의 클러스터 관리 기능이 제한될 수 있습니다. 자세한 내용은 기술 자료 문서 link:https://kb.netapp.com/onprem/ontap/ONTAP_Select/OTS_Deploy_cluster_refresh_fails_with_error%3A_ONTAPSelectSysCLIVersionFailed_zapi_returned_bad_status_0%3A_None["OTS Deploy 클러스터 새로 고침이 오류와 함께 실패합니다"^]를 참조하십시오.
+
+.LIF
+고객이 지정하는 LIF에는 두 가지 유형이 있습니다.
+
+* 클러스터 관리(클러스터당 1개)
+* 노드 관리(노드당 1개)
+
+
+
+NOTE: 다중 노드 클러스터에는 자동 생성된 LIF가 있는 내부 네트워크가 있습니다.
+
+.SVM
+3개의 SVM이 활성 상태입니다.
+
+* 관리 SVM
+* 노드 SVM
+* 시스템(클러스터) SVM
+
+
+
+NOTE: 데이터 SVM은 ONTAP Select 클러스터 배포의 일부로 생성되지 않습니다. 배포 후 클러스터 관리자가 생성해야 합니다. 자세한 내용은 https://docs.netapp.com/us-en/ontap/nfs-config/create-svms-data-access-task.html["SVM 생성"^]을 참조하십시오.
+
+.애그리게이트
+루트 애그리게이트가 생성되었습니다.
+
+.기능
+모든 기능은 라이선스가 부여되어 사용 가능합니다. SnapLock과 FabricPool은 각각 별도의 라이선스가 필요합니다.
+
+.관련 정보
+* link:https://docs.netapp.com/us-en/ontap/system-admin/types-svms-concept.html["클러스터에 포함된 SVM 유형"^]
+* link:reference_lic_ontap_features.html["기본적으로 라이센스가 부여되는 ONTAP 기능"]
+

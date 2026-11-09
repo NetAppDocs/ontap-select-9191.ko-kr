@@ -1,0 +1,98 @@
+---
+sidebar: sidebar 
+permalink: task_cli_upgrade_deploy.html 
+keywords: administer, administering, cli, deploy, upgrade deploy 
+summary: 명령줄 인터페이스를 사용하여 기존 Deploy 유틸리티 가상 머신을 현재 위치에서 업그레이드할 수 있습니다. 
+---
+= ONTAP Select Deploy 인스턴스 업그레이드
+:hardbreaks:
+:allow-uri-read: 
+:nofooter: 
+:icons: font
+:linkattrs: 
+:imagesdir: ./media/
+
+
+[role="lead"]
+ONTAP Select Deploy 유틸리티 CLI를 사용하여 기존 ONTAP Select Deploy 유틸리티 가상 머신을 제자리에서 업그레이드합니다.
+
+ONTAP Select Deploy 9.18.1 또는 9.17.1에서 ONTAP Select Deploy 9.19.1로 직접 업그레이드할 수 있습니다. 이전 버전(예: ONTAP Select Deploy 9.16.1)에서 업그레이드하려면 먼저 ONTAP Select Deploy 9.17.1 또는 9.18.1로 업그레이드한 다음 ONTAP Select Deploy 9.19.1로 업그레이드해야 합니다.
+
+[NOTE]
+====
+이전 버전의 ONTAP Select Deploy 관리 유틸리티가 설치되어 있는 경우 최신 버전으로 업그레이드해야 합니다. ONTAP Select 노드와 ONTAP Select Deploy 구성 요소는 각각 별도로 업그레이드할 수 있습니다. 자세한 내용은 link:concept_adm_upgrading_nodes.html["ONTAP Select 노드를 업그레이드합니다"^]을 참조하십시오.
+
+====
+.시작하기 전에
+업그레이드 중에 ONTAP Select Deploy가 다른 작업을 수행하는 데 사용되지 않는지 확인하십시오.
+
+
+
+[[step-1-download-the-upgrade-package]]
+== 1단계: 업그레이드 패키지 다운로드
+
+업그레이드 프로세스를 시작하려면 NetApp Support 사이트에서 ONTAP Select Deploy 업그레이드 파일을 다운로드하십시오. 업그레이드 패키지는 단일 압축 파일 형식으로 제공됩니다.
+
+.단계
+. link:https://mysupport.netapp.com/site/downloads/["NetApp Support 사이트 다운로드"^] 페이지에 액세스합니다.
+. 아래로 스크롤하여 *ONTAP Select Deploy*를 선택합니다.
+. 원하는 ONTAP Select 버전을 선택하십시오.
+. 최종 사용자 라이센스 계약(EULA)을 검토하고 *Accept & Continue*를 선택하십시오.
+. 적절한 *ONTAP Select Deploy Upgrade* 패키지를 선택하여 다운로드하십시오. 필요에 따라 모든 프롬프트에 응답하십시오.
+
+
+
+
+[[step-2-upload-the-package-to-the-ontap-select-deploy-virtual-machine]]
+== 2단계: 패키지를 ONTAP Select Deploy 가상 머신에 업로드합니다.
+
+패키지를 다운로드한 후에는 해당 파일을 ONTAP Select Deploy 가상 머신에 업로드해야 합니다.
+
+.이 작업 정보
+이 작업에서는 ONTAP Select Deploy 가상 머신에 파일을 업로드하는 한 가지 방법을 설명합니다. 사용 환경에 따라 다른 방법이 더 적합할 수도 있습니다.
+
+.시작하기 전에
+* 업그레이드 파일이 로컬 워크스테이션에 있는지 확인하십시오.
+* 관리자 사용자 계정의 암호가 있는지 확인합니다.
+
+
+.단계
+로컬 워크스테이션의 명령 셸에서  `scp`(Secure Copy Protocol) 유틸리티를 사용하여 다음 예와 같이 이미지 파일을 ONTAP Select Deploy 가상 머신에 업로드합니다.
+
+....
+scp ONTAPdeploy2.12_upgrade.tar.gz admin@10.228.162.221:/home/admin (provide password when prompted)
+....
+.결과
+업그레이드 파일은 admin 사용자의 홈 디렉토리에 저장됩니다.
+
+
+
+[[step-3-apply-the-upgrade-package]]
+== 3단계: 업그레이드 패키지 적용
+
+ONTAP Select Deploy 가상 머신에 업그레이드 파일을 업로드한 후 업그레이드를 적용할 수 있습니다.
+
+.시작하기 전에
+* ONTAP Select Deploy 유틸리티 가상 머신에서 업그레이드 파일이 배치된 디렉터리를 확인합니다.
+* 업그레이드가 수행되는 동안 ONTAP Select Deploy가 다른 작업을 수행하는 데 사용되지 않는지 확인하십시오.
+
+
+.단계
+. 관리자 계정으로 SSH를 사용하여 ONTAP Select Deploy 유틸리티 CLI에 로그인하십시오.
+. 적절한 디렉터리 경로와 파일 이름을 사용하여 업그레이드를 수행하십시오.
++
+[source, cli]
+----
+deploy upgrade -package-path <file_path>
+----
++
+명령 예:
+
++
+....
+deploy upgrade -package-path /home/admin/ONTAPdeploy2.12_upgrade.tar.gz
+....
+
+
+.완료한 후
+업그레이드 절차가 완료되기 전에 ONTAP Select Deploy 가상 머신 구성의 백업을 생성하라는 메시지가 표시됩니다. 또한 새로 생성된 ONTAP Select Deploy 페이지를 볼 수 있도록 브라우저 캐시를 지워야 합니다.

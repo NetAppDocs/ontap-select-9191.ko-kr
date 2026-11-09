@@ -1,0 +1,138 @@
+---
+sidebar: sidebar 
+permalink: reference_plan_dep_general.html 
+keywords: plan, planning, ontap select deploy, general requirements 
+summary: ONTAP Select Deploy 관리 유틸리티를 설치하기 위한 계획을 세울 때 고려해야 할 몇 가지 일반적인 요구 사항이 있습니다. 
+---
+= ONTAP Select Deploy 일반 요구 사항 및 계획
+:hardbreaks:
+:allow-uri-read: 
+:nofooter: 
+:icons: font
+:linkattrs: 
+:imagesdir: ./media/
+
+
+[role="lead"]
+ONTAP Select Deploy 관리 유틸리티를 설치하기 위한 계획을 세울 때 고려해야 할 몇 가지 일반적인 요구 사항이 있습니다.
+
+
+
+[[pairing-the-deploy-utility-with-the-ontap-select-clusters]]
+== Deploy 유틸리티를 ONTAP Select 클러스터와 페어링하기
+
+Deploy 유틸리티 인스턴스를 ONTAP Select 클러스터와 페어링할 때 몇 가지 옵션이 있습니다.
+
+
+NOTE: 모든 배포 시나리오에서 단일 ONTAP Select 클러스터와 클러스터의 노드는 Deploy 관리 유틸리티의 단일 인스턴스로만 관리할 수 있습니다. 클러스터는 Deploy 유틸리티의 두 개 이상의 서로 다른 인스턴스로 관리할 수 없습니다.
+
+.각 ONTAP Select 클러스터에 대한 유틸리티 인스턴스 하나
+ONTAP Select 클러스터는 배포 유틸리티의 전용 인스턴스를 사용하여 배포 및 관리할 수 있습니다. 이러한 일대일 구성에서는 유틸리티와 클러스터 간의 쌍이 명확하게 분리됩니다. 이 구성은 장애 도메인 크기를 줄여 높은 수준의 격리를 제공합니다.
+
+.여러 ONTAP Select 클러스터를 위한 유틸리티의 한 인스턴스
+단일 Deploy 유틸리티 인스턴스를 사용하여 조직 내에서 여러 ONTAP Select 클러스터를 배포하고 관리할 수 있습니다. 이러한 일대다 구성에서는 모든 처리 및 구성 데이터가 동일한 Deploy 유틸리티 인스턴스에서 관리됩니다.
+
+
+NOTE: Deploy 유틸리티의 한 인스턴스는 최대 400개의 ONTAP Select 노드 또는 100개의 클러스터를 관리할 수 있습니다.
+
+
+
+[[requirements-related-to-the-kvm-environment]]
+== KVM 환경 관련 요구 사항
+
+KVM 하이퍼바이저 환경에 Deploy 관리 유틸리티를 설치하기 전에 기본 요구 사항을 검토하고 배포를 준비해야 합니다.
+
+.배포를 위한 요구 사항 및 제한 사항
+KVM 환경에 ONTAP Select Deploy 유틸리티를 설치할 때 고려해야 할 몇 가지 요구 사항과 제한 사항이 있습니다.
+
+.Linux KVM 호스트 서버 하드웨어 요구사항
+Linux KVM 하이퍼바이저 호스트가 충족해야 하는 몇 가지 최소 리소스 요구 사항이 있습니다. ONTAP Select가 배포된 호스트가 다음 기본 요구 사항을 충족하는지 확인하십시오.
+
+* Linux 서버:
++
+** 하드웨어와 소프트웨어는 64비트여야 합니다.
+** 서버는 ONTAP Select 노드에 대해 정의된 지원 버전과 동일한 버전을 준수해야 합니다.
+
+
+* 가상 CPU(2)
+* 가상 메모리(4GB)
+* 스토리지(40GB)
+* "DHCP(Dynamic Host Configuration Protocol)가 활성화되었습니다(고정 IP 주소를 할당할 수도 있음)."
+
+
+.네트워크 연결
+Deploy 가상 머신 네트워크 인터페이스가 구성되어 있고 관리하는 ONTAP Select 호스트에 연결할 수 있는지 확인하십시오.
+
+.IP 버전 4 지원
+ONTAP Select Deploy는 IP 버전 4(IPv4)만 지원합니다. IP 버전 6(IPv6)은 지원되지 않습니다. 이러한 제한 사항은 다음과 같은 방식으로 ONTAP Select에 영향을 미칩니다.
+
+* Deploy VM의 관리 LIF에 IPv4 주소를 할당해야 합니다.
+* Deploy는 ONTAP LIF에서 IPv6를 사용하도록 구성된 ONTAP Select 노드를 생성할 수 없습니다.
+
+
+
+
+[[required-configuration-information]]
+== 필수 구성 정보
+
+배포 계획의 일환으로 ONTAP Select Deploy 관리 유틸리티를 설치하기 전에 필요한 구성 정보를 확인해야 합니다.
+
+.Deploy VM의 이름
+VM에 사용할 이름입니다.
+
+.Linux KVM 호스트의 이름
+Deploy 유틸리티가 설치된 Linux KVM 호스트입니다.
+
+.스토리지 풀의 이름
+VM 파일을 보유하는 스토리지 풀(약 40GB 필요).
+
+.VM용 네트워크
+Deploy VM이 연결된 네트워크입니다.
+
+
+
+[[optional-network-configuration-information]]
+== 선택적 네트워크 구성 정보
+
+배포 VM은 기본적으로 DHCP를 사용하여 구성됩니다. 하지만 필요한 경우 VM의 네트워크 인터페이스를 수동으로 구성할 수 있습니다.
+
+.호스트 이름
+호스트의 이름입니다.
+
+.호스트 IP 주소
+고정 IPv4 주소입니다.
+
+.서브넷 마스크
+VM이 속한 네트워크를 기반으로 하는 서브넷 마스크입니다.
+
+.게이트웨이
+기본 게이트웨이 또는 라우터입니다.
+
+.기본 DNS 서버
+기본 도메인 네임 서버.
+
+.보조 DNS 서버
+보조 도메인 네임 서버.
+
+.검색 도메인
+사용할 검색 도메인입니다.
+
+
+
+[[authentication-using-the-credential-store]]
+== 자격 증명 저장소를 사용한 인증
+
+ONTAP Select Deploy 자격 증명 저장소는 계정 정보를 저장하는 데이터베이스입니다. Deploy는 클러스터 생성 및 관리의 일환으로 호스트 인증을 수행하기 위해 계정 자격 증명을 사용합니다. ONTAP Select 배포를 계획할 때 자격 증명 저장소의 사용 방식을 숙지해야 합니다.
+
+
+NOTE: 계정 정보는 AES 암호화 알고리즘과 SHA-256 해싱 알고리즘을 사용하여 데이터베이스에 안전하게 저장됩니다.
+
+.자격 증명 유형
+지원되는 자격 증명 유형은 다음과 같습니다.
+
+* *호스트*: ONTAP Select 노드를 VMware ESXi에 직접 배포할 때 하이퍼바이저 호스트를 인증하는 데 사용됩니다.
+* *vCenter*: 호스트가 VMware vCenter에 의해 관리될 때 ESXi에 ONTAP Select 노드를 배포하는 과정에서 vCenter 서버를 인증하는 데 사용됩니다
+
+
+.액세스
+자격 증명 저장소는 하이퍼바이저 호스트 추가와 같은 Deploy를 사용한 일반적인 관리 작업을 수행하는 과정에서 내부적으로 액세스됩니다. 또한 Deploy 웹 사용자 인터페이스 및 CLI를 통해 자격 증명 저장소를 직접 관리할 수도 있습니다.

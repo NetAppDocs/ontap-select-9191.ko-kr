@@ -1,0 +1,75 @@
+---
+sidebar: sidebar 
+permalink: concept_api_async_proc.html 
+keywords: rest api, deploy rest api, rest, asynchronous processing, job object 
+summary: Deploy API 호출 중 일부, 특히 리소스를 생성하거나 수정하는 호출은 다른 호출보다 완료하는 데 시간이 더 오래 걸릴 수 있습니다. ONTAP Select Deploy는 이러한 장시간 실행되는 요청을 비동기적으로 처리합니다. 
+---
+= ONTAP Select용 Job 객체를 사용한 비동기 처리
+:hardbreaks:
+:allow-uri-read: 
+:nofooter: 
+:icons: font
+:linkattrs: 
+:imagesdir: ./media/
+
+
+[role="lead"]
+Deploy API 호출 중 일부, 특히 리소스를 생성하거나 수정하는 호출은 다른 호출보다 완료하는 데 시간이 더 오래 걸릴 수 있습니다. ONTAP Select Deploy는 이러한 장시간 실행되는 요청을 비동기적으로 처리합니다.
+
+
+
+[[asynchronous-requests-described-using-job-object]]
+== Job 객체를 사용하여 설명된 비동기 요청
+
+비동기적으로 실행되는 API 호출 후 HTTP 응답 코드 202는 요청이 성공적으로 검증되고 수락되었지만 아직 완료되지 않았음을 나타냅니다. 요청은 백그라운드 작업으로 처리되며, 클라이언트에 대한 초기 HTTP 응답 이후에도 계속 실행됩니다. 응답에는 요청을 연결하는 Job 객체와 해당 고유 식별자가 포함됩니다.
+
+
+NOTE: 비동기적으로 작동하는 API 호출을 확인하려면 ONTAP Select Deploy 온라인 설명서 페이지를 참조하십시오.
+
+
+
+[[query-the-job-object-associated-with-an-api-request]]
+== API 요청과 연결된 Job 객체를 쿼리합니다
+
+HTTP 응답에 반환되는 Job 객체에는 여러 속성이 포함되어 있습니다. state 속성을 조회하여 요청이 성공적으로 완료되었는지 확인할 수 있습니다. Job 객체는 다음 상태 중 하나일 수 있습니다.
+
+* 대기 중
+* 실행 중
+* 성공
+* 실패
+
+
+Job 객체를 폴링하여 작업의 종료 상태(성공 또는 실패)를 감지하는 데 사용할 수 있는 두 가지 기술이 있습니다.
+
+* 표준 폴링 요청 현재 작업 상태가 즉시 반환됩니다
+* 장기 폴링 요청 작업 상태는 다음 중 하나가 발생할 때만 반환됩니다.
++
+** 상태가 폴 요청에 제공된 날짜-시간 값보다 최근에 변경되었습니다
+** 타임아웃 값이 만료되었습니다(1~120초)
+
+
+
+
+표준 폴링과 롱 폴링은 동일한 API 호출을 사용하여 Job 객체를 쿼리합니다. 그러나 롱 폴링 요청에는 두 개의 쿼리 매개변수 `poll_timeout`및 `last_modified`가 포함됩니다.
+
+
+TIP: Deploy 가상 머신의 작업 부하를 줄이려면 항상 롱 폴링을 사용해야 합니다.
+
+
+
+[[general-procedure-for-issuing-an-asynchronous-request]]
+== 비동기 요청을 발행하는 일반적인 절차
+
+다음과 같은 상위 수준 절차를 사용하여 비동기 API 호출을 완료할 수 있습니다.
+
+. 비동기 API 호출을 실행합니다.
+. 요청이 성공적으로 수락되었음을 나타내는 HTTP 응답 202를 수신합니다.
+. 응답 본문에서 Job 객체의 식별자를 추출합니다.
+. 루프 내에서 각 주기마다 다음을 수행합니다.
++
+.. 롱폴 요청을 사용하여 작업의 현재 상태를 가져옵니다
+.. 작업이 비종료 상태(대기 중, 실행 중)인 경우 루프를 다시 수행합니다.
+
+
+. 작업이 최종 상태(성공, 실패)에 도달하면 중지합니다.
+

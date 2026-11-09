@@ -1,0 +1,289 @@
+---
+sidebar: sidebar 
+permalink: task_adm_security.html 
+keywords: administer, administering, web, security 
+summary: ONTAP Select 배포 보안의 일환으로 수행할 수 있는 관련 작업이 몇 가지 있습니다. 
+---
+= ONTAP Select 배포 보안
+:hardbreaks:
+:allow-uri-read: 
+:nofooter: 
+:icons: font
+:linkattrs: 
+:imagesdir: ./media/
+
+
+[role="lead"]
+ONTAP Select 배포 보안의 일환으로 수행할 수 있는 관련 작업이 몇 가지 있습니다.
+
+
+
+[[change-the-deploy-administrator-password]]
+== Deploy 관리자 암호 변경
+
+웹 사용자 인터페이스를 사용하여 필요에 따라 Deploy 가상 머신 관리자 계정의 암호를 변경할 수 있습니다.
+
+.단계
+. 관리자 계정을 사용하여 Deploy 유틸리티 웹 사용자 인터페이스에 로그인하십시오.
+. 페이지 오른쪽 상단의 사람 모양 아이콘을 선택한 다음 *비밀번호 변경*을 선택합니다.
+. 안내에 따라 현재 비밀번호와 새 비밀번호를 입력하고 * 제출 * 을 선택합니다.
+
+
+
+
+[[add-a-management-server-account]]
+== 관리 서버 계정 추가
+
+Deploy 자격 증명 저장소 데이터베이스에 관리 서버 계정을 추가할 수 있습니다.
+
+.시작하기 전에
+ONTAP Select Deploy에서 사용하는 자격 증명 유형과 사용 방법에 대해 잘 알고 있어야 합니다.
+
+.단계
+. 관리자 계정을 사용하여 Deploy 유틸리티 웹 사용자 인터페이스에 로그인하십시오.
+. 페이지 상단의 *Administration* 탭을 선택합니다.
+. *Management Servers* > *Add vCenter*를 선택합니다.
+. 다음 정보를 입력하고 * 추가 * 를 선택합니다.
++
+[cols="30,70"]
+|===
+| 이 필드에서… | 다음을 수행하십시오. 
+
+
+| 이름/IP 주소 | vCenter 서버의 도메인 이름 또는 IP 주소를 제공하십시오. 
+
+
+| 사용자 이름 | vCenter에 액세스할 계정 사용자 이름을 입력합니다. 
+
+
+| 비밀번호 | 해당 사용자 이름에 대한 비밀번호를 입력하십시오. 
+|===
+. 필요에 따라 새 관리 서버가 추가된 후 image:icon_kebab.gif["옵션"]를 선택한 다음 다음 중 하나를 선택하십시오.
++
+** 자격 증명 업데이트
+** 자격 증명 확인
+** 관리 서버 제거
+
+
+
+
+
+
+[[configure-mfa]]
+== MFA 구성
+
+ONTAP Select 9.13.1부터 ONTAP Select Deploy 관리자 계정에 대해 다단계 인증(MFA)이 지원됩니다.
+
+* link:task_adm_security.html#ontap-select-deploy-cli-mfa-login-using-yubikey-piv-or-fido2-authentication["ONTAP Select Deploy CLI MFA 로그인 시 YubiKey Personal Identity Verification(PIV) 또는 Fast IDentity Online(FIDO2) 인증 사용"]
+* <<ssh-keygen을 사용한 ONTAP Select Deploy CLI MFA 로그인>>
+
+
+
+
+[[ontap-select-deploy-cli-mfa-login-using-yubikey-piv-or-fido2-authentication]]
+== ONTAP Select Deploy CLI MFA YubiKey PIV 또는 FIDO2 인증을 사용한 로그인
+
+
+
+[[yubikey-piv]]
+=== YubiKey PIV
+
+YubiKey PIN을 구성하고 link:https://docs.netapp.com/us-en/ontap-technical-reports/security.html#multifactor-authentication["TR-4647: ONTAP의 다중 요소 인증"^]의 단계에 따라 Remote Support Agent(RSA) 또는 Elliptic Curve Digital Signature Algorithm(ECDSA) 개인 키와 인증서를 생성하거나 가져오세요.
+
+* Windows용: 기술 보고서의 *Windows용 YubiKey PIV 클라이언트 구성* 섹션을 참조하십시오.
+* MacOS의 경우: 기술 보고서의 *MAC OS 및 Linux용 YubiKey PIV 클라이언트 구성* 섹션을 참조하십시오.
+
+
+
+
+[[fido2]]
+=== FIDO2
+
+YubiKey FIDO2 인증을 선택하려면 YubiKey Manager를 사용하여 YubiKey FIDO2 PIN을 구성하고 Windows에서는 PuTTY-CAC(Common Access Card)를, MacOS에서는 ssh-keygen을 사용하여 FIDO2 키를 생성하십시오. 자세한 단계는 기술 보고서 link:https://docs.netapp.com/us-en/ontap-technical-reports/security.html#multifactor-authentication["TR-4647: ONTAP의 다중 요소 인증"^]에 나와 있습니다.
+
+* Windows용: 기술 보고서의 *Windows용 YubiKey FIDO2 클라이언트 구성* 섹션을 참조하십시오.
+* MacOS의 경우: 기술 보고서의 *Mac OS 및 Linux용 YubiKey FIDO2 클라이언트 구성* 섹션을 참조하십시오.
+
+
+
+
+[[obtain-the-yubikey-piv-or-fido2-public-key]]
+=== YubiKey PIV 또는 FIDO2 공개 키를 얻으십시오
+
+공개 키를 얻는 방법은 Windows 클라이언트인지 MacOS 클라이언트인지, 그리고 PIV 또는 FIDO2를 사용하는지에 따라 다릅니다.
+
+.Windows의 경우:
+* TR-4647의 16페이지에 있는 *Configuring the Windows PuTTY-CAC SSH Client for YubiKey PIV Authentication* 섹션에 설명된 대로 SSH → Certificate 아래의 *Copy to Clipboard* 기능을 사용하여 PIV 공개 키를 내보냅니다.
+* TR-4647의 30페이지에 있는 *YubiKey FIDO2 인증을 위한 Windows PuTTY-CAC SSH 클라이언트 구성* 섹션에 설명된 대로 SSH → 인증서 아래의 *클립보드에 복사* 기능을 사용하여 FIDO2 공개 키를 내보냅니다.
+
+
+.MacOS의 경우:
+* PIV 공개 키는 TR-4647의 24페이지에 있는 *YubiKey PIV 인증을 위한 Mac OS 또는 Linux SSH 클라이언트 구성* 섹션에 설명된  `ssh-keygen -e` 명령을 사용하여 내보내야 합니다.
+* FIDO2 공개 키는 ECDSA 또는 EDD519 사용 여부에 따라  `id_ecdsa_sk.pub` 파일 또는  `id_edd519_sk.pub` 파일에 있으며, TR-4647의 39페이지에 있는 *YubiKey FIDO2 인증을 위한 MAC OS 또는 Linux SSH 클라이언트 구성* 섹션에 설명되어 있습니다.
+
+
+
+
+[[configure-the-public-key-in-ontap-select-deploy]]
+== ONTAP Select Deploy에서 공개 키를 구성합니다
+
+SSH는 관리자 계정에서 공개 키 인증 방법에 사용됩니다. 인증 방법이 표준 SSH 공개 키 인증이든 YubiKey PIV 인증이든 FIDO2 인증이든 사용되는 명령은 동일합니다.
+
+하드웨어 기반 SSH MFA의 경우, ONTAP Select Deploy에 구성된 공개 키 외에 다음과 같은 인증 요소가 있습니다.
+
+* PIV 또는 FIDO2 PIN
+* YubiKey 하드웨어 장치를 소유하고 있어야 합니다. FIDO2의 경우, 인증 과정 중에 YubiKey를 직접 만지는 것으로 확인됩니다.
+
+
+.시작하기 전에
+YubiKey에 대해 구성된 PIV 또는 FIDO2 공개 키를 설정합니다. ONTAP Select Deploy CLI 명령 `security publickey add -key`은 PIV 또는 FIDO2 모두 동일하며 공개 키 문자열만 다릅니다.
+
+공개 키는 다음에서 가져옵니다.
+
+* PIV 및 FIDO2용 PuTTY-CAC의 *클립보드에 복사* 기능(Windows)
+* PIV용  `ssh-keygen -e` 명령을 사용하여 SSH 호환 형식으로 공개 키 내보내기
+* FIDO2(MacOS)용 `~/.ssh/id_***_sk.pub` 파일에 있는 공개 키 파일
+
+
+.단계
+.  `.ssh/id_***.pub` 파일에서 생성된 키를 찾으십시오.
+.  `security publickey add -key <key>` 명령을 사용하여 생성된 키를 ONTAP Select Deploy에 추가합니다.
++
+[listing]
+----
+(ONTAPdeploy) security publickey add -key "ssh-rsa <key> user@netapp.com"
+----
+.  `security multifactor authentication enable` 명령을 사용하여 MFA 인증을 활성화합니다.
++
+[listing]
+----
+(ONTAPdeploy) security multifactor authentication enable
+MFA enabled Successfully
+----
+
+
+
+
+[[log-in-to-ontap-select-deploy-using-yubikey-piv-authentication-over-ssh]]
+== SSH를 통한 YubiKey PIV 인증을 사용하여 ONTAP Select Deploy에 로그인합니다
+
+SSH를 통해 YubiKey PIV 인증을 사용하여 ONTAP Select Deploy에 로그인할 수 있습니다.
+
+.단계
+. YubiKey 토큰, SSH 클라이언트 및 ONTAP Select Deploy 구성이 완료되면 SSH를 통해 MFA YubiKey PIV 인증을 사용할 수 있습니다.
+. ONTAP Select Deploy에 로그인합니다. Windows PuTTY-CAC SSH 클라이언트를 사용하는 경우 YubiKey PIN을 입력하라는 대화 상자가 나타납니다.
+. YubiKey가 연결된 기기에서 로그인하세요.
+
+
+.출력 예:
+[listing]
+----
+login as: admin
+Authenticating with public key "<public_key>"
+Further authentication required
+<admin>'s password:
+
+NetApp ONTAP Select Deploy Utility.
+Copyright (C) NetApp Inc.
+All rights reserved.
+
+Version: NetApp Release 9.13.1 Build:6811765 08-17-2023 03:08:09
+
+(ONTAPdeploy)
+----
+
+
+[[ontap-select-deploy-cli-mfa-login-using-ssh-keygen]]
+== ssh-keygen을 사용한 ONTAP Select Deploy CLI MFA 로그인
+
+ `ssh-keygen` 명령은 SSH용 새 인증 키 쌍을 생성하는 도구입니다. 키 쌍은 로그인 자동화, Single Sign-On 및 호스트 인증에 사용됩니다.
+
+ `ssh-keygen` 명령은 인증 키에 대해 여러 공개 키 알고리즘을 지원합니다.
+
+* 알고리즘은 `-t` 옵션을 사용하여 선택됩니다
+* 키 크기는  `-b` 옵션을 사용하여 선택합니다.
+
+
+.출력 예:
+[listing]
+----
+ssh-keygen -t ecdsa -b 521
+ssh-keygen -t ed25519
+ssh-keygen -t ecdsa
+----
+.단계
+.  `.ssh/id_***.pub` 파일에서 생성된 키를 찾으십시오.
+.  `security publickey add -key <key>` 명령을 사용하여 생성된 키를 ONTAP Select Deploy에 추가합니다.
++
+[listing]
+----
+(ONTAPdeploy) security publickey add -key "ssh-rsa <key> user@netapp.com"
+----
+.  `security multifactor authentication enable` 명령을 사용하여 MFA 인증을 활성화합니다.
++
+[listing]
+----
+(ONTAPdeploy) security multifactor authentication enable
+MFA enabled Successfully
+----
+. MFA를 활성화한 후 ONTAP Select Deploy 시스템에 로그인하십시오. 다음 예시와 유사한 출력이 표시될 것입니다.
++
+[listing]
+----
+[<user ID> ~]$ ssh <admin>
+Authenticated with partial success.
+<admin>'s password:
+
+NetApp ONTAP Select Deploy Utility.
+Copyright (C) NetApp Inc.
+All rights reserved.
+
+Version: NetApp Release 9.13.1 Build:6811765 08-17-2023 03:08:09
+
+(ONTAPdeploy)
+----
+
+
+
+
+[[migrate-from-mfa-to-single-factor-authentication]]
+=== MFA에서 단일 요소 인증으로 마이그레이션하세요
+
+Deploy 관리자 계정에 대한 MFA는 다음 방법을 사용하여 비활성화할 수 있습니다.
+
+* Secure Shell(SSH)을 사용하여 관리자 권한으로 Deploy CLI에 로그인할 수 있는 경우 Deploy CLI에서  `security multifactor authentication disable` 명령을 실행하여 MFA를 비활성화하십시오.
++
+[listing]
+----
+(ONTAPdeploy) security multifactor authentication disable
+MFA disabled Successfully
+----
+* SSH를 사용하여 관리자로 Deploy CLI에 로그인할 수 없는 경우:
++
+.. vCenter 또는 vSphere를 통해 Deploy 가상 머신(VM) 비디오 콘솔에 연결합니다.
+.. 관리자 계정을 사용하여 Deploy CLI에 로그인합니다.
+..  `security multifactor authentication disable` 명령을 실행합니다.
++
+[listing]
+----
+Debian GNU/Linux 11 <user ID> tty1
+
+<hostname> login: admin
+Password:
+
+NetApp ONTAP Select Deploy Utility.
+Copyright (C) NetApp Inc.
+All rights reserved.
+
+Version: NetApp Release 9.13.1 Build:6811765 08-17-2023 03:08:09
+
+(ONTAPdeploy) security multifactor authentication disable
+MFA disabled successfully
+
+(ONTAPdeploy)
+----
+
+
+* 관리자는 다음 명령어를 사용하여 공개 키를 삭제할 수 있습니다.
+`security publickey delete -key`
+

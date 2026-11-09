@@ -1,0 +1,172 @@
+---
+sidebar: sidebar 
+permalink: reference_plan_ots_networking.html 
+keywords: plan, planning, networking, network, drivers, vmxnet3, cluster mtu, firewall 
+summary: ONTAP Select를 구축하기 전에 하이퍼바이저 네트워크를 올바르게 구성해야 합니다. 
+---
+= ONTAP Select 네트워킹 요구 사항
+:hardbreaks:
+:allow-uri-read: 
+:nofooter: 
+:icons: font
+:linkattrs: 
+:imagesdir: ./media/
+
+
+[role="lead"]
+ONTAP Select를 구축하기 전에 하이퍼바이저 네트워크를 올바르게 구성해야 합니다.
+
+
+
+[[virtual-switch-options]]
+== 가상 스위치 옵션
+
+외부 네트워크와 내부 네트워크(다중 노드 클러스터만 해당)를 지원하려면 각 ONTAP Select 호스트에 가상 스위치를 구성해야 합니다. 다중 노드 클러스터를 배포하는 과정에서 내부 클러스터 네트워크의 네트워크 연결을 테스트해야 합니다.
+
+
+NOTE: 하이퍼바이저 호스트에서 vSwitch를 구성하는 방법과 고속 인터페이스 기능에 대한 자세한 내용은 link:concept_nw_concepts_chars.html["심층 네트워킹"] 섹션을 참조하십시오.
+
+
+
+[[upgrade-to-vmxnet3-esxi-only]]
+== VMXNET3으로 업그레이드(ESXi 전용)
+
+Deploy 2.10을 사용하는 ONTAP Select 9.5부터 VMXNET3이 VMware ESXi의 새 클러스터 배포에 포함된 기본 네트워크 드라이버입니다. 이전 ONTAP Select 노드를 버전 9.5 이상으로 업그레이드하는 경우 드라이버는 자동으로 업그레이드되지 않습니다.
+
+
+
+[[cluster-mtu]]
+== 클러스터 MTU
+
+다중 노드 클러스터에서 ONTAP Select 노드를 연결하는 데 별도의 내부 네트워크가 사용됩니다. 일반적으로 이 네트워크의 MTU 크기는 9000입니다. 그러나 ONTAP Select 노드를 연결하는 네트워크에 이 MTU 크기가 너무 큰 경우가 있습니다. 더 작은 프레임을 수용하기 위해 내부 네트워크에서 ONTAP Select가 사용하는 MTU 크기는 7500-9000바이트 범위일 수 있습니다.
+
+MTU 크기는 클러스터 생성 페이지의 클러스터 세부 정보 섹션에 표시됩니다. 이 값은 Deploy 관리 유틸리티에 의해 다음과 같이 결정됩니다.
+
+. 초기 기본값은 9000입니다.
+. HA 쌍에 호스트와 네트워크를 추가하면 네트워크의 vSwitches 구성에 따라 필요한 만큼 MTU 값이 줄어듭니다.
+. 클러스터의 최종 클러스터 MTU 값은 모든 HA 쌍을 추가하고 클러스터를 생성할 준비가 된 후에 설정됩니다.
+
+
+
+NOTE: 네트워크 설계에 따라 필요한 경우 클러스터 MTU 값을 수동으로 설정할 수 있습니다.
+
+
+
+[[two-nic-host-with-standard-vswitch-esxi-only]]
+== 표준 vSwitch가 있는 2-NIC 호스트(ESXi 전용)
+
+2-NIC 구성에서 ONTAP Select 성능을 향상시키려면 두 개의 포트 그룹을 사용하여 내부 및 외부 네트워크 트래픽을 분리해야 합니다. 이 권장 사항은 다음과 같은 특정 구성에 적용됩니다.
+
+* ONTAP Select 다중 노드 클러스터
+* 2개의 NIC(NIC1 및 NIC2)
+* 표준 vSwitch
+
+
+이 환경에서는 다음과 같이 두 개의 포트 그룹을 사용하여 네트워크 트래픽을 구성해야 합니다.
+
+.포트 그룹 1
+* 내부 네트워크(클러스터, RSM, HA-IC 트래픽)
+* NIC1가 활성 상태입니다
+* 대기 모드의 NIC2
+
+
+.포트 그룹 2
+* 외부 네트워크(데이터 및 관리 트래픽)
+* NIC1은 대기 모드입니다
+* NIC2 활성
+
+
+2-NIC 구축에 대한 자세한 내용은 link:concept_nw_concepts_chars.html["심층 네트워킹"] 섹션을 참조하십시오.
+
+
+
+[[four-nic-host-with-standard-vswitch-esxi-only]]
+== 표준 vSwitch가 있는 4-NIC 호스트(ESXi 전용)
+
+4-NIC 구성에서 ONTAP Select 성능을 향상시키려면 4개의 포트 그룹을 사용하여 내부 및 외부 네트워크 트래픽을 분리해야 합니다. 이 권장 사항은 다음과 같은 특정 구성에 적용됩니다.
+
+* ONTAP Select 다중 노드 클러스터
+* 4개의 NIC(NIC1, NIC2, NIC3 및 NIC4)
+* 표준 vSwitch
+
+
+이 환경에서는 다음과 같이 4개의 포트 그룹을 사용하여 네트워크 트래픽을 구성해야 합니다.
+
+.포트 그룹 1
+* 내부 네트워크(클러스터, RSM 트래픽)
+* NIC1가 활성 상태입니다
+* NIC2, NIC3, NIC4 대기 중
+
+
+.포트 그룹 2
+* 내부 네트워크(클러스터, HA-IC 트래픽)
+* NIC3가 활성 상태입니다
+* NIC1, NIC2, NIC4 대기 중
+
+
+.포트 그룹 3
+* 외부 네트워크(데이터 및 관리 트래픽)
+* NIC2가 활성 상태입니다
+* NIC1, NIC3, NIC4 대기 중
+
+
+.포트 그룹 4
+* 외부 네트워크(데이터 트래픽)
+* NIC4가 활성 상태입니다
+* NIC1, NIC2, NIC3 대기 중
+
+
+4-NIC 배포에 대한 자세한 내용은 link:concept_nw_concepts_chars.html["심층 네트워킹"] 섹션을 참조하십시오.
+
+
+
+[[network-traffic-requirements]]
+== 네트워크 트래픽 요구사항
+
+ONTAP Select 구축 환경에서 다양한 참여자 간에 네트워크 트래픽이 원활하게 흐르도록 방화벽이 올바르게 구성되어 있는지 확인해야 합니다.
+
+.참가자
+ONTAP Select 구축 과정에서 네트워크 트래픽을 교환하는 참여자 또는 주체는 여러 개 있습니다. 이러한 주체들을 소개하고, 네트워크 트래픽 요구 사항에 대한 요약 설명에 사용합니다.
+
+* ONTAP Select Deploy 관리 유틸리티를 배포합니다
+* vSphere(ESXi 전용) 클러스터 배포에서 호스트 관리 방식에 따라 vSphere 서버 또는 ESXi 호스트
+* 하이퍼바이저 서버 ESXi 하이퍼바이저 호스트 또는 Linux KVM 호스트
+* OTS 노드 ONTAP Select 노드
+* OTS 클러스터 ONTAP Select 클러스터
+* Admin WS 로컬 관리 워크스테이션
+
+
+.네트워크 트래픽 요구 사항 요약
+다음 표는 ONTAP Select 구축에 필요한 네트워크 트래픽 요구 사항을 설명합니다.
+
+[cols="20,20,35,25"]
+|===
+| 프로토콜/포트 | ESXi / KVM | 방향 | 설명 
+
+
+| TLS(443) | ESXi | vCenter 서버(관리형) 또는 ESXi(관리형 또는 비관리형)에 배포합니다 | VMware VIX API 
+
+
+| 902 | ESXi | vCenter 서버(관리형) 또는 ESXi(비관리형)에 배포합니다 | VMware VIX API 
+
+
+| ICMP | ESXi 또는 KVM | 하이퍼바이저 서버에 배포 | 핑 
+
+
+| ICMP | ESXi 또는 KVM | 각 OTS 노드에 배포 | 핑 
+
+
+| SSH(22) | ESXi 또는 KVM | 각 OTS 노드에 대한 관리 WS | 관리 
+
+
+| SSH(22) | KVM | 하이퍼바이저 서버 노드에 배포 | 하이퍼바이저 서버에 액세스합니다 
+
+
+| TLS(443) | ESXi 또는 KVM | OTS 노드 및 클러스터에 배포 | ONTAP 액세스 
+
+
+| TLS(443) | ESXi 또는 KVM | 배포할 각 OTS 노드 | Deploy 액세스(Capacity Pools 라이센싱) 
+
+
+| iSCSI(3260) | ESXi 또는 KVM | 배포할 각 OTS 노드 | 중재자/사서함 디스크 
+|===

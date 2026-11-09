@@ -1,0 +1,196 @@
+---
+sidebar: sidebar 
+permalink: task_adm_licenses.html 
+keywords: administer, administering, web, licenses 
+summary: ONTAP Select 라이센스 관리의 일부로 수행할 수 있는 몇 가지 관련 작업이 있습니다. 
+---
+= ONTAP Select 라이센스 관리
+:hardbreaks:
+:allow-uri-read: 
+:nofooter: 
+:icons: font
+:linkattrs: 
+:imagesdir: ./media/
+
+
+[role="lead"]
+ONTAP Select 라이센스 관리의 일부로 수행할 수 있는 몇 가지 관련 작업이 있습니다.
+
+
+
+[[manage-the-capacity-tier-licenses]]
+== 용량 계층 라이센스 관리
+
+필요에 따라 ONTAP Select Capacity Tier 라이선스를 추가, 편집 및 삭제할 수 있습니다.
+
+.단계
+. 관리자 계정을 사용하여 웹 인터페이스를 통해 Deploy 유틸리티에 로그인하십시오.
+. 페이지 상단의 *Administration* 탭을 선택합니다.
+. *Licenses*를 선택하고 *Capacity Tier*를 선택하십시오.
+. 선택 사항으로 *필터*를 선택하여 표시되는 라이센스를 제한합니다.
+. 기존 라이선스를 교체하려면 라이선스를 선택하고 image:icon_kebab.gif["옵션"]를 선택한 다음 *Update*를 선택하십시오.
+. 새 라이센스를 추가하려면 페이지 상단의 *Add*를 선택한 다음 *Upload License(s)*를 선택하고 로컬 워크스테이션에서 라이센스 파일을 선택하십시오.
+
+
+
+
+[[manage-the-capacity-pool-licenses]]
+== Capacity Pool 라이센스 관리
+
+필요에 따라 ONTAP Select Capacity Pool 라이센스를 추가, 편집 및 삭제할 수 있습니다.
+
+.단계
+. 관리자 계정을 사용하여 웹 인터페이스를 통해 Deploy 유틸리티에 로그인하십시오.
+. 페이지 상단의 *Administration* 탭을 선택합니다.
+. *Licenses*를 선택하고 *Capacity Pools*를 선택하세요.
+. 선택적으로 *Filter*를 선택하여 표시되는 라이센스를 제한할 수 있습니다.
+. 선택적으로 라이선스를 선택하고 image:icon_kebab.gif["옵션"]를 선택하여 기존 라이선스를 관리합니다.
+. 새 라이센스를 추가하거나 기존 라이센스를 갱신합니다.
++
+[role="tabbed-block"]
+====
+.새 라이센스 추가
+--
+새 라이센스를 추가하려면 페이지 상단에서 * 추가 * 를 선택합니다.
+
+--
+.기존 라이센스 갱신
+--
+기존 라이센스를 갱신하려면:
+
+.. 기존 라이선스에서 image:icon_kebab.gif["옵션"]을(를) 선택합니다.
+.. *라이선스 업로드*를 선택합니다.
+.. 로컬 워크스테이션에서 라이센스 파일을 선택합니다.
+
+
+--
+====
+. 용량 풀 목록을 보려면 다음을 수행합니다.
++
+.. *요약*을 선택합니다.
+.. 풀을 선택하고 확장하여 풀에서 스토리지를 임대하는 클러스터 및 노드를 확인합니다.
+.. *License Information*에서 라이센스의 현재 상태를 확인합니다.
+.. 풀에 대해 발행된 임대 기간은 Lease expiration에서 변경할 수 있습니다.
+
+
+. 클러스터 목록을 보려면 다음을 수행합니다.
++
+.. *세부 정보*를 선택합니다.
+.. 클러스터를 선택하고 확장하여 스토리지 사용량을 확인하십시오.
+
+
+
+
+
+
+[[reinstall-a-capacity-pool-license]]
+== Capacity Pool 라이센스 재설치
+
+모든 활성 Capacity Pool 라이센스는 Deploy 관리 유틸리티 인스턴스 내에 있는 특정 License Manager 인스턴스에 고정됩니다. Capacity Pool 라이센스를 사용 중인 상태에서 Deploy 인스턴스를 복원하거나 복구하면 기존 라이센스는 더 이상 유효하지 않습니다. 새 용량 라이센스 파일을 생성한 다음 새 Deploy 인스턴스에 라이센스를 설치해야 합니다.
+
+.시작하기 전에
+* 원래 Deploy 인스턴스에서 사용된 모든 Capacity Pool 라이센스를 확인합니다.
+* 새 Deploy 인스턴스를 생성하는 과정에서 백업을 복원하는 경우, 백업이 최신 상태인지 확인하십시오.
+* 원본 Deploy 인스턴스에서 가장 최근에 생성된 ONTAP Select 노드를 찾습니다(원본 Deploy 인스턴스의 최신 백업이 새 Deploy 인스턴스로 복원되지 않은 경우에만 해당).
+* Deploy 인스턴스를 복원하거나 다시 생성합니다
+
+
+.이 작업 정보
+크게 보면 이 작업은 세 부분으로 구성됩니다. Deploy 인스턴스에서 사용하는 모든 Capacity Pool 라이센스를 재생성하고 설치해야 합니다. 모든 라이센스가 새 Deploy 인스턴스에 다시 설치된 후 필요한 경우 일련 번호 시퀀스를 재설정할 수 있습니다. 마지막으로 Deploy IP 주소가 변경된 경우 Capacity Pools 라이센스를 사용하는 모든 ONTAP Select 노드를 업데이트해야 합니다.
+
+.단계
+. NetApp 지원팀에 문의하여 최초 배포 인스턴스에 대한 모든 용량 풀 라이센스를 바인딩 해제 및 등록 해제하십시오.
+. 각 Capacity Pool 라이센스에 대한 새 라이센스 파일을 획득하고 다운로드하십시오.
++
+자세한 내용은 link:task_lic_acquire_cp.html["Capacity Pool 라이센스 취득"]을(를) 참조하십시오.
+
+. 새 Deploy 인스턴스에 용량 풀 라이센스를 설치합니다.
++
+.. 관리자 계정을 사용하여 Deploy 유틸리티 웹 사용자 인터페이스에 로그인하십시오.
+.. 페이지 상단의 *Administration* 탭을 선택합니다.
+.. *Licenses*를 선택한 다음 *Capacity Pool*을 선택하십시오.
+.. *추가*를 선택한 다음 *라이선스 업로드*를 선택하여 라이선스를 선택하고 업로드합니다.
+
+
+. 백업을 복원하지 않고 새 Deploy 인스턴스를 생성했거나 최신 상태가 아닌 백업을 사용한 경우 일련 번호 시퀀스를 업데이트해야 합니다.
++
+.. 관리자 계정을 사용하여 Deploy 유틸리티 명령줄 인터페이스에 로그인하십시오.
+.. 최초 Deploy 인스턴스에서 가장 최근에 생성된 노드의 일련 번호를 표시합니다.
++
+`node show -cluster-name CLUSTER_NAME -name NODE_NAME -detailed`
+
+.. 20자리 노드 일련 번호에서 마지막 8자리를 추출하여 원래 Deploy 인스턴스에서 사용된 마지막 일련 시퀀스 번호를 얻습니다.
+.. 일련 번호에 20을 더하여 새 일련 번호를 생성합니다.
+.. 새 Deploy 인스턴스에 대한 일련 번호를 설정합니다.
++
+`license-manager modify -serial-sequence SEQ_NUMBER`
+
+
+
+. 새 Deploy 인스턴스에 할당된 IP 주소가 원래 Deploy 인스턴스의 IP 주소와 다른 경우 Capacity Pools 라이센스를 사용하는 모든 ONTAP Select 노드에서 IP 주소를 업데이트해야 합니다.
++
+.. ONTAP Select 노드의 ONTAP 명령줄 인터페이스에 로그인합니다.
+.. 고급 권한 모드 시작:
++
+`set adv`
+
+.. 현재 구성 표시:
++
+`system license license-manager show`
+
+.. 노드에서 사용할 라이선스 관리자(배포) IP 주소를 설정합니다.
++
+`system license license-manager modify -host NEW_IP_ADDRESS`
+
+
+
+
+
+
+
+[[convert-an-evaluation-license-to-a-production-license]]
+[[convert-license]]
+== 평가판 라이센스를 프로덕션 라이센스로 전환
+
+Deploy 관리 유틸리티를 사용하여 ONTAP Select 평가 클러스터를 프로덕션 Capacity Tier 라이센스를 사용하도록 업그레이드할 수 있습니다.
+
+.시작하기 전에
+* 각 노드에는 프로덕션 라이센스에 필요한 최소 용량을 지원할 수 있도록 충분한 스토리지가 할당되어 있어야 합니다.
+* 평가 클러스터의 각 노드에 대해 Capacity Tier 라이센스가 있어야 합니다.
+
+
+.이 작업 정보
+단일 노드 클러스터에 대한 클러스터 라이센스 수정을 수행하면 중단이 발생합니다. 하지만 다중 노드 클러스터의 경우, 라이센스를 적용하기 위해 변환 프로세스가 각 노드를 한 번에 하나씩 재부팅하므로 이러한 경우가 발생하지 않습니다.
+
+.단계
+. 관리자 계정을 사용하여 Deploy 유틸리티 웹 사용자 인터페이스에 로그인하십시오.
+. 페이지 상단의 *Clusters* 탭을 선택하고 원하는 클러스터를 선택합니다.
+. 클러스터 세부 정보 페이지 상단에서 *Click here*를 선택하여 클러스터 라이센스를 수정합니다.
++
+*클러스터 세부 정보* 섹션에서 평가판 라이선스 옆에 있는 *수정*을 선택할 수도 있습니다.
+
+. 각 노드에 사용 가능한 운영 라이센스를 선택하거나 필요에 따라 추가 라이센스를 업로드하십시오.
+. ONTAP 자격 증명을 입력하고 *수정*을 선택합니다.
++
+클러스터 라이선스 업그레이드는 몇 분 정도 소요될 수 있습니다. 페이지를 나가거나 다른 변경 작업을 하기 전에 업그레이드 과정이 완료될 때까지 기다려 주십시오.
+
+
+
+.완료한 후
+평가 배포를 위해 각 노드에 원래 할당되었던 20자리 노드 일련 번호는 업그레이드에 사용된 운영 라이센스의 9자리 일련 번호로 대체됩니다.
+
+
+
+[[manage-an-expired-capacity-pool-license]]
+== 만료된 Capacity Pool 라이센스 관리
+
+일반적으로 라이센스가 만료되더라도 아무 일도 발생하지 않습니다. 그러나 노드가 만료된 라이센스와 연결되어 있기 때문에 다른 라이센스를 설치할 수 없습니다. 라이센스를 갱신할 때까지 재부팅 또는 페일오버 작업과 같이 애그리게이트를 오프라인 상태로 만드는 작업을 수행해서는 _안 됩니다_. 권장 조치는 라이센스 갱신을 신속하게 처리하는 것입니다.
+
+ONTAP Select 및 라이센스 갱신에 대한 자세한 내용은 link:reference_faq.html#licenses-installation-upgrades-and-reverts["FAQ"]의 라이센스, 설치, 업그레이드 및 되돌리기 섹션을 참조하십시오.
+
+
+
+[[manage-add-on-licenses]]
+== 추가 기능 라이센스 관리
+
+ONTAP Select 제품의 경우, 추가 라이선스는 ONTAP 내에서 직접 적용되며 ONTAP Select Deploy를 통해 관리되지 않습니다. 자세한 내용은 link:https://docs.netapp.com/us-en/ontap/system-admin/manage-licenses-concept.html["라이센스 관리 개요(클러스터 관리자만 해당)"^] 및 link:https://docs.netapp.com/us-en/ontap/task_admin_enable_new_features.html["라이센스 키를 추가하여 새 기능을 활성화합니다"^]을 참조하십시오.

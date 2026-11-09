@@ -1,0 +1,491 @@
+---
+sidebar: sidebar 
+permalink: task_cli_deploy_cluster.html 
+keywords: administer, administering, cli, create cluster, deploy cluster 
+summary: ONTAP Select Deploy 관리 유틸리티와 함께 제공되는 명령줄 인터페이스를 사용하여 단일 노드 또는 다중 노드 ONTAP Select 클러스터를 생성할 수 있습니다. 
+---
+= CLI를 사용하여 ONTAP Select 클러스터 배포
+:hardbreaks:
+:allow-uri-read: 
+:nofooter: 
+:icons: font
+:linkattrs: 
+:imagesdir: ./media/
+
+
+[role="lead"]
+ONTAP Select Deploy 관리 유틸리티와 함께 제공되는 명령줄 인터페이스를 사용하여 단일 노드 또는 다중 노드 ONTAP Select 클러스터를 생성할 수 있습니다.
+
+
+
+[[step-1-prepare-for-the-deployment]]
+== 1단계: 구축 준비
+
+하이퍼바이저에서 ONTAP Select 클러스터를 생성하기 전에 필요한 준비 사항을 이해해야 합니다.
+
+.단계
+. ONTAP Select 노드에 스토리지를 연결할 준비를 하십시오
++
+[role="tabbed-block"]
+====
+.하드웨어 RAID
+--
+로컬 하드웨어 RAID 컨트롤러를 사용하는 경우 시스템 데이터와 루트 및 데이터 애그리게이트를 위해 각 노드에 최소 하나의 데이터 저장소(ESXi) 또는 하나의 link:kvm-host-configuration-and-preparation-checklist.html#step-2-create-a-storage-pool["스토리지 풀(KVM)"]를 생성해야 합니다. ONTAP Select 노드를 구성하는 과정에서 스토리지 풀을 연결해야 합니다.
+
+--
+.소프트웨어 RAID
+--
+소프트웨어 RAID를 사용하는 경우 시스템 데이터용 데이터스토어(ESXi) 또는 link:kvm-host-configuration-and-preparation-checklist.html#step-2-create-a-storage-pool["스토리지 풀(KVM)"]를 하나 이상 생성하고 루트 및 데이터 애그리게이트에 SSD 드라이브를 사용할 수 있는지 확인해야 합니다. ONTAP Select 노드를 구성하는 과정에서 스토리지 풀과 디스크를 연결해야 합니다.
+
+--
+====
+. 사용 가능한 ONTAP Select 버전
++
+Deploy 관리 유틸리티에는 단일 버전의 ONTAP Select가 포함되어 있습니다. 이전 버전의 ONTAP Select를 사용하여 클러스터를 구축하려면 먼저 Deploy 인스턴스에 link:task_cli_deploy_image_add.html["ONTAP Select 이미지를 추가합니다"]해야 합니다.
+
+. 운영 구축을 위한 ONTAP Select 라이센스
++
+운영 환경에 ONTAP Select 클러스터를 구축하기 전에 스토리지 용량 라이센스를 구매하고 관련 라이센스 파일을 다운로드해야 합니다. _Capacity Tiers_ 모델을 사용하여 link:concept_lic_production.html["각 노드에서 스토리지 라이센스 부여"]하거나 _Capacity Pools_ 모델을 사용하여 공유 풀에 라이센스를 부여할 수 있습니다.
+
+
+
+
+
+[[step-2-upload-and-register-a-license-file]]
+== 2단계: 라이센스 파일 업로드 및 등록
+
+스토리지 용량이 포함된 라이선스 파일을 확보한 후에는 해당 라이선스가 포함된 파일을 Deploy 가상 머신에 업로드하고 등록해야 합니다.
+
+
+NOTE: 평가 목적으로만 클러스터를 배포하는 경우 이 단계를 건너뛸 수 있습니다.
+
+.시작하기 전에
+admin 사용자 계정의 암호가 있어야 합니다.
+
+.단계
+. 로컬 워크스테이션의 명령 셸에서 sftp 유틸리티를 사용하여 라이센스 파일을 Deploy 가상 머신에 업로드합니다.
++
+출력 예:
+
++
+....
+sftp admin@10.234.81.101 (provide password when prompted)
+put NLF-320000nnn.txt
+exit
+....
+. SSH를 사용하여 관리자 계정으로 Deploy 유틸리티 CLI에 로그인하십시오.
+. 라이센스 등록:
++
+[source, cli]
+----
+license add -file-name <file_name>
+----
++
+메시지가 표시되면 관리자 계정 암호를 입력하십시오.
+
+. 시스템의 라이센스를 표시하여 라이센스가 올바르게 추가되었는지 확인합니다.
++
+[source, cli]
+----
+license show
+----
+
+
+
+
+[[step-3-add-hypervisor-hosts]]
+== 3단계: 하이퍼바이저 호스트 추가
+
+ONTAP Select 노드가 실행될 각 하이퍼바이저 호스트를 등록해야 합니다.
+
+[role="tabbed-block"]
+====
+.KVM
+--
+ONTAP Select 노드가 실행될 하이퍼바이저 호스트를 등록해야 합니다. 이 과정에서 Deploy 관리 유틸리티는 KVM 호스트에 인증합니다.
+
+.이 작업 정보
+하이퍼바이저 호스트가 둘 이상 필요한 경우 이 절차를 사용하여 각 호스트를 추가하십시오.
+
+.단계
+. 관리자 계정으로 SSH를 사용하여 배포 유틸리티 CLI에 로그인하십시오.
+. 호스트 등록:
++
+[source, cli]
+----
+host register -name <FQDN|IP> -hypervisor-type KVM -username <KVM_username>
+----
++
+출력 예:
+
++
+[listing]
+----
+host register -name 10.234.81.14 -hypervisor-type KVM -username root
+----
++
+메시지가 나타나면 호스트 계정의 비밀번호를 입력하십시오.
+
+. 호스트의 상태를 표시하고 인증되었는지 확인합니다.
++
+[source, cli]
+----
+host show -name <FQDN|IP> -detailed
+----
++
+출력 예:
+
++
+[listing]
+----
+host show -name 10.234.81.14 -detailed
+----
+
+
+--
+.ESXi
+--
+이 과정의 일환으로 Deploy 관리 유틸리티는 호스트를 관리하는 vCenter 서버에 인증하거나 ESXi 독립 실행형 호스트에 직접 인증합니다.
+
+.이 작업 정보
+vCenter에서 관리하는 호스트를 등록하기 전에 vCenter 서버에 대한 관리 서버 계정을 추가해야 합니다. 호스트가 vCenter에서 관리되지 않는 경우 호스트 등록 과정에서 호스트 자격 증명을 제공할 수 있습니다. 각 호스트를 추가할 때마다 이 절차를 따라야 합니다.
+
+.단계
+. 관리자 계정으로 SSH를 사용하여 배포 유틸리티 CLI에 로그인하십시오.
+. 호스트가 vCenter 서버에서 관리되는 경우 vCenter 계정 자격 증명을 추가하십시오.
++
+[source, cli]
+----
+credential add -hostname <FQDN|IP> -type vcenter -username <vcenter_username>
+----
++
+출력 예:
+
++
+....
+credential add -hostname vc.select.company-demo.com -type vcenter -username administrator@vsphere.local
+....
+. 호스트 등록:
++
+** vCenter에서 관리하지 않는 독립 실행형 호스트를 등록합니다.
++
+[source, cli]
+----
+host register -name <FQDN|IP> -hypervisor-type ESX -username <esx_username>
+----
+** vCenter에서 관리하는 호스트를 등록합니다.
++
+[source, cli]
+----
+host register -name <FQDN|IP> -hypervisor-type ESX -mgmt-server <FQDN|IP>
+----
++
+출력 예:
+
++
+....
+host register -name 10.234.81.14 -hypervisor-type ESX -mgmt-server vc.select.company-demo.com
+....
+
+
+. 호스트의 상태를 표시하고 인증되었는지 확인합니다.
++
+[source, cli]
+----
+host show -name <FQDN|IP> -detailed
+----
++
+출력 예:
+
++
+....
+host show -name 10.234.81.14 -detailed
+....
+
+
+--
+====
+
+
+[[step-4-create-and-configure-an-ontap-select-cluster]]
+== 4단계: ONTAP Select 클러스터 생성 및 구성
+
+ONTAP Select 클러스터를 생성한 다음 구성해야 합니다. 클러스터를 구성한 후 개별 노드를 구성할 수 있습니다.
+
+.시작하기 전에
+클러스터에 포함될 노드 수를 결정하고 관련 구성 정보를 준비합니다.
+
+.이 작업 정보
+ONTAP Select 클러스터를 생성할 때 Deploy 유틸리티는 사용자가 제공하는 클러스터 이름과 노드 수를 기반으로 노드 이름을 자동으로 생성합니다. Deploy는 고유한 노드 식별자도 생성합니다.
+
+.단계
+. 관리자 계정으로 SSH를 사용하여 배포 유틸리티 CLI에 로그인하십시오.
+. 클러스터를 생성합니다.
++
+[source, cli]
+----
+cluster create -name <cluster_name> -node-count <count>
+----
++
+출력 예:
+
++
+....
+cluster create -name test-cluster -node-count 1
+....
+. 클러스터 구성:
++
+[source, cli]
+----
+cluster modify -name <cluster_name> -mgmt-ip <IP_address> -netmask <netmask> -gateway <IP_address> -dns-servers <FQDN|IP>_LIST -dns-domains <domain_list>
+----
++
+출력 예:
+
++
+....
+cluster modify -name test-cluster -mgmt-ip 10.234.81.20 -netmask 255.255.255.192
+-gateway 10.234.81.1 -dns-servers 10.221.220.10 -dnsdomains select.company-demo.com
+....
+. 클러스터의 구성 및 상태를 표시합니다.
++
+[source, cli]
+----
+cluster show -name <cluster_name> -detailed
+----
+
+
+
+
+[[step-5-configure-an-ontap-select-node]]
+== 5단계: ONTAP Select 노드 구성
+
+ONTAP Select 클러스터의 각 노드를 구성해야 합니다.
+
+.시작하기 전에
+* 노드에 대한 구성 정보를 가지고 있는지 확인하십시오.
+* Deploy 유틸리티에서 Capacity Tier 또는 Capacity Pool 라이센스 파일이 업로드되고 설치되었는지 확인하십시오.
+
+
+.이 작업 정보
+이 절차를 사용하여 각 노드를 구성해야 합니다. 이 예에서는 Capacity Tier 라이센스가 노드에 적용됩니다.
+
+.단계
+. 관리자 계정으로 SSH를 사용하여 배포 유틸리티 CLI에 로그인하십시오.
+. 클러스터 노드에 할당된 이름을 확인하십시오.
++
+[source, cli]
+----
+node show -cluster-name <cluster_name>
+----
+. 노드를 선택하고 기본 구성을 수행합니다.
++
+[source, cli]
+----
+node modify -name <node_name> -cluster-name <cluster_name> -host-name <FQDN|IP> -license-serial-number <number> -instance-type TYPE -passthrough-disks false
+----
++
+출력 예:
+
++
+....
+node modify -name test-cluster-01 -cluster-name test-cluster -host-name 10.234.81.14
+-license-serial-number 320000nnnn -instance-type small -passthrough-disks false
+....
++
+노드의 RAID 구성은 _passthrough-disks_ 매개변수로 지정됩니다. 로컬 하드웨어 RAID 컨트롤러를 사용하는 경우 이 값은 "false"여야 합니다. 소프트웨어 RAID를 사용하는 경우 이 값은 "true"여야 합니다.
+
++
+ONTAP Select 노드에는 용량 계층 라이센스가 사용됩니다.
+
+. 호스트에서 사용 가능한 네트워크 구성을 표시합니다.
++
+[source, cli]
+----
+host network show -host-name <FQDN|IP> -detailed
+----
++
+출력 예:
+
++
+....
+host network show -host-name 10.234.81.14 -detailed
+....
+. 노드의 네트워크 구성을 수행합니다.
++
+[role="tabbed-block"]
+====
+.ESXi 호스트
+--
+[source, cli]
+----
+node modify -name <node_name> -cluster-name <cluster_name> -mgmt-ip IP -management-networks <network_name> -data-networks <network_name> -internal-network <network_name>
+----
+--
+.KVM 호스트
+--
+[source, cli]
+----
+node modify -name <node_name> -cluster-name <cluster_name> -mgmt-ip IP -management-vlans <vlan_id> -data-vlans <vlan_id> -internal-vlans <vlad_id>
+----
+--
+====
++
+단일 노드 클러스터를 구축할 때는 내부 네트워크가 필요하지 않으므로 "-internal-network"를 제거해야 합니다.
+
++
+출력 예:
+
++
+....
+node modify -name test-cluster-01 -cluster-name test-cluster -mgmt-ip 10.234.81.21
+-management-networks sDOT_Network -data-networks sDOT_Network
+....
+. 노드의 구성을 표시합니다.
++
+[source, cli]
+----
+node show -name <node_name> -cluster-name <cluster_name> -detailed
+----
++
+출력 예:
+
++
+....
+node show -name test-cluster-01 -cluster-name test-cluster -detailed
+....
+
+
+
+
+[[step-6-attach-storage-to-the-ontap-select-nodes]]
+== 6단계: ONTAP Select 노드에 스토리지를 연결합니다
+
+ONTAP Select 클러스터의 각 노드에서 사용하는 스토리지를 구성합니다. 모든 노드에는 항상 하나 이상의 스토리지 풀을 할당해야 합니다. 소프트웨어 RAID를 사용하는 경우 각 노드에 하나 이상의 디스크 드라이브도 할당해야 합니다.
+
+.시작하기 전에
+VMware vSphere를 사용하여 스토리지 풀을 생성합니다. 소프트웨어 RAID를 사용하는 경우 최소 하나 이상의 사용 가능한 디스크 드라이브도 필요합니다.
+
+.이 작업 정보
+로컬 하드웨어 RAID 컨트롤러를 사용하는 경우 1단계부터 4단계까지 수행해야 합니다. 소프트웨어 RAID를 사용하는 경우 1단계부터 6단계까지 수행해야 합니다.
+
+.단계
+. 관리자 계정 자격 증명을 사용하여 SSH를 통해 배포 유틸리티 CLI에 로그인하십시오.
+. 호스트에서 사용 가능한 스토리지 풀을 표시합니다.
++
+[source, cli]
+----
+host storage pool show -host-name <FQDN|IP>
+----
++
+출력 예:
+
++
+[listing]
+----
+host storage pool show -host-name 10.234.81.14
+----
++
+VMware vSphere를 통해 사용 가능한 스토리지 풀을 얻을 수도 있습니다.
+
+. 사용 가능한 스토리지 풀을 ONTAP Select 노드에 연결합니다.
++
+[source, cli]
+----
+node storage pool attach -name <pool_name> -cluster-name <cluster_name> -node-name <node_name> -capacity-limit <limit>
+----
++
+"-capacity-limit" 매개변수를 포함하는 경우 값을 GB 또는 TB로 지정하십시오.
+
++
+출력 예:
+
++
+[listing]
+----
+node storage pool attach -name sDOT-02 -cluster-name test-cluster -
+node-name test-cluster-01 -capacity-limit 500GB
+----
+. 노드에 연결된 스토리지 풀을 표시합니다.
++
+[source, cli]
+----
+node storage pool show -cluster-name <cluster_name> -node-name <node_name>
+----
++
+출력 예:
+
++
+[listing]
+----
+node storage pool show -cluster-name test-cluster -node-name testcluster-01
+----
+. 소프트웨어 RAID를 사용하는 경우 사용 가능한 드라이브를 연결하십시오.
++
+[source, cli]
+----
+node storage disk attach -node-name <node_name> -cluster-name <cluster_name> -disks <list_of_drives>
+----
++
+출력 예:
+
++
+[listing]
+----
+node storage disk attach -node-name NVME_SN-01 -cluster-name NVME_SN -disks 0000:66:00.0 0000:67:00.0 0000:68:00.0
+----
+. 소프트웨어 RAID를 사용하는 경우 노드에 연결된 디스크를 표시하십시오.
++
+[source, cli]
+----
+node storage disk show -node-name <node_name> -cluster-name <cluster_name>`
+----
++
+출력 예:
+
++
+[listing]
+----
+node storage disk show -node-name sdot-smicro-009a -cluster-name NVME
+----
+
+
+
+
+[[step-7-deploy-an-ontap-select-cluster]]
+== 7단계: ONTAP Select 클러스터 배포
+
+클러스터와 노드 구성이 완료되면 클러스터를 배포할 수 있습니다.
+
+.시작하기 전에
+link:task_adm_connectivity.html["웹 UI"] 또는 link:task_cli_connectivity.html["CLI"]를 사용하여 네트워크 연결 검사기를 실행하고 내부 네트워크에서 클러스터 노드 간의 연결을 확인하십시오.
+
+.단계
+. 관리자 계정으로 SSH를 사용하여 배포 유틸리티 CLI에 로그인하십시오.
+. ONTAP Select 클러스터를 구축합니다.
++
+[source, cli]
+----
+cluster deploy -name <cluster_name>
+----
++
+출력 예:
+
++
+[listing]
+----
+cluster deploy -name test-cluster
+----
++
+메시지가 표시되면 ONTAP 관리자 계정에 사용할 암호를 입력합니다.
+
+. 클러스터 상태를 표시하여 성공적으로 배포되었는지 확인합니다.
++
+[source, cli]
+----
+cluster show -name <cluster_name>
+----
+
+
+.다음 단계
+link:task_cli_clusters.html["ONTAP Select Deploy 구성 데이터를 백업하십시오"].

@@ -1,0 +1,92 @@
+---
+sidebar: sidebar 
+permalink: reference_plan_ots_vcenter.html 
+keywords: plan, planning, vmware vcenter, vcenter server, vcenter 
+summary: VMware vCenter와 관련하여 고려해야 할 몇 가지 계획 요구 사항이 있습니다. 
+---
+= ESXi의 ONTAP Select VMware vCenter 서버
+:hardbreaks:
+:allow-uri-read: 
+:nofooter: 
+:icons: font
+:linkattrs: 
+:imagesdir: ./media/
+
+
+[role="lead"]
+vCenter 서버 계정을 정의하고 필요한 관리 권한이 포함된 역할과 연결해야 합니다.
+
+
+NOTE: 또한 ONTAP Select가 배포된 ESXi 하이퍼바이저 호스트를 관리하는 vCenter 서버의 정규화된 도메인 이름 또는 IP 주소가 필요합니다.
+
+
+
+[[administrative-privileges]]
+== 관리 권한
+
+ONTAP Select 클러스터를 생성하고 관리하는 데 필요한 최소 관리 권한은 다음과 같습니다.
+
+
+
+[[datastore]]
+=== 데이터 저장소
+
+* 공간 할당
+* 데이터 저장소 찾아보기
+* 저수준 파일 작업
+* 가상 머신 파일 업데이트
+* 가상 머신 메타데이터 업데이트
+
+
+
+
+[[host]]
+=== 호스트
+
+구성::
++
+--
+* 네트워크 구성
+* 시스템 관리
+
+
+--
+로컬 작업::
++
+--
+* 가상 머신 생성
+* 가상 머신 삭제
+* 가상 머신 재구성
+
+
+--
+
+
+
+
+[[network]]
+=== 네트워크
+
+* 네트워크 할당
+
+
+
+
+[[virtual-machine]]
+=== 가상 머신
+
+구성:: 카테고리의 모든 권한.
+상호 작용:: 카테고리의 모든 권한.
+인벤토리:: 카테고리의 모든 권한.
+프로비저닝:: 카테고리의 모든 권한.
+
+
+
+
+[[vapp]]
+=== vApp
+
+카테고리의 모든 권한.
+
+.관련 정보
+link:reference_plan_dep_vmware.html#vmware-vcenter-server-considerations["vCenter에서 vSAN ESA를 위한 VMware vSphere 권한에 대해 알아보기"]

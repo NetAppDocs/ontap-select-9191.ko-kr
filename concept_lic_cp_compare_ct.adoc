@@ -1,0 +1,61 @@
+---
+sidebar: sidebar 
+permalink: concept_lic_cp_compare_ct.html 
+keywords: license, licensing, Capacity Pools, Capacity Tiers, comparing 
+summary: Capacity Tiers 라이센스 모델과 Capacity Pools 라이센스 모델에는 몇 가지 차이점이 있습니다. 
+---
+= ONTAP Select 용량 등급 및 용량 풀 라이선스 비교
+:hardbreaks:
+:allow-uri-read: 
+:nofooter: 
+:icons: font
+:linkattrs: 
+:imagesdir: ./media/
+
+
+[role="lead"]
+다음 표는 ONTAP Select에서 지원하는 두 가지 프로덕션 라이센스 모델을 비교한 것입니다.
+
+[cols="20,40,40"]
+|===
+|  | 용량 계층 | 용량 풀 
+
+
+| 라이센스 일련 번호 | NetApp은 9자리 숫자를 생성하여 노드에 할당합니다 | NetApp은 9자리 숫자를 생성하여 용량 풀에 할당합니다. 
+
+
+| 라이센스 잠금 | ONTAP Select 노드에 고정됨 | License Manager 인스턴스에 잠겨 있습니다. 
+
+
+| 라이센스 기간 | 영구(갱신 불필요) | 구매를 기준으로 한 고정 기간(갱신 필요) 
+
+
+| 데이터 애그리게이트에 대한 임대 기간 | 해당 사항 없음 | 1시간에서 7일 
+
+
+| 노드 일련 번호 | 9자리 숫자이며 라이센스 일련 번호와 같습니다 | 20자리 숫자이며 License Manager에 의해 생성되었습니다. 
+
+
+| 지원 | 추가 기능 및 기간 제한 | 포함 및 동시 계약 
+
+
+| 라이센스 유형 | Standard, Premium, Premium XL | Standard, Premium, Premium XL 
+
+
+| 평가판 라이센스 사용 가능 | 예 | 예 
+
+
+| 평가에서 운영 환경으로 업그레이드 | 예 | 아니요 
+
+
+| ONTAP Select 가상 머신 크기 조정(소형에서 중형, 중형에서 대형) | 예 | 예 
+
+
+| 적용: 라이센스 만료 | 해당 없음 | 예(유예 기간 없음) 
+
+
+| 최소 라이센스 | 1 TB | 2 TB 
+
+
+| 최대 관리 공간 | 노드당 400TB | 노드당 400TB 
+|===

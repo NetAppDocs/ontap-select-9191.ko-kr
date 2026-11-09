@@ -1,0 +1,190 @@
+---
+sidebar: sidebar 
+permalink: reference_plan_ots_general.html 
+keywords: plan, planning, general requirements 
+summary: ONTAP Select 구축을 계획할 때 고려해야 할 몇 가지 일반적인 요구 사항이 있습니다. 
+---
+= ONTAP Select 요구 사항 및 계획 고려 사항
+:hardbreaks:
+:allow-uri-read: 
+:nofooter: 
+:icons: font
+:linkattrs: 
+:imagesdir: ./media/
+
+
+[role="lead"]
+ONTAP Select 구축을 계획할 때 고려해야 할 몇 가지 일반적인 요구 사항이 있습니다.
+
+
+
+[[required-linux-knowledge-and-skills-for-kvm]]
+== KVM에 필요한 Linux 지식 및 기술
+
+KVM 하이퍼바이저를 사용하는 Linux는 작업하기에 복잡한 환경입니다. KVM에 ONTAP Select를 배포하기 전에 필요한 지식과 기술을 갖추어야 합니다.
+
+Linux 서버 배포판:: ONTAP Select 배포에 사용할 특정 Linux 배포판에 대한 경험이 있어야 합니다. 특히 다음과 같은 작업을 수행할 수 있어야 합니다.
++
+--
+* Linux 배포판을 설치합니다
+* CLI를 사용하여 시스템을 구성합니다
+* 소프트웨어 패키지 및 모든 종속성 추가
+
+
+--
+
+
+필요한 구성 및 소프트웨어 패키지를 포함하여 Linux 서버 준비에 대한 자세한 내용은 link:kvm-host-configuration-and-preparation-checklist.html["호스트 구성 체크리스트"]을(를) 참조하십시오. 현재 지원되는 Linux 배포판의 하이퍼바이저 요구 사항을 참조하십시오.
+
+KVM 배포 및 관리:: 일반적인 가상화 개념에 익숙해야 합니다. 또한 KVM 환경에서 ONTAP Select를 설치하고 관리하는 과정에서 사용해야 하는 몇 가지 Linux CLI 명령이 있습니다.
++
+--
+* `virt-install`
+* `virsh`
+* `lsblk`
+* `lvs`
+* `vgs`
+* `pvs`
+
+
+--
+네트워킹 및 Open vSwitch 구성:: 네트워킹 개념과 네트워크 스위치 구성에 익숙해야 합니다. 또한 Open vSwitch에 대한 경험이 있어야 합니다. KVM 환경에서 ONTAP Select 네트워크를 구성하는 과정에서 다음 네트워크 명령을 사용해야 합니다.
++
+--
+* `ovs-vsctl`
+* `ip`
+* `ip link`
+* `systemctl`
+
+
+--
+
+
+
+
+[[cluster-size-and-related-considerations]]
+== 클러스터 크기 및 관련 고려 사항
+
+클러스터 크기와 관련하여 고려해야 할 몇 가지 계획 문제가 있습니다.
+
+클러스터의 노드 수:: ONTAP Select 클러스터는 1개, 2개, 4개, 6개, 8개, 10개 또는 12개의 노드로 구성됩니다. 애플리케이션 요구 사항에 따라 클러스터 크기를 결정해야 합니다. 예를 들어, 엔터프라이즈 구축에 HA 기능이 필요한 경우 다중 노드 클러스터를 사용해야 합니다.
+전용 vs. 코로케이션:: 애플리케이션 유형에 따라 배포가 전용 모델을 따르는지 아니면 collocated 모델을 따르는지 결정해야 합니다. collocated 모델은 워크로드의 다양성과 긴밀한 통합으로 인해 더 복잡할 수 있다는 점에 유의하십시오.
+
+
+
+
+[[hypervisor-host-considerations]]
+== 하이퍼바이저 호스트 고려 사항
+
+고려해야 할 하이퍼바이저 호스트와 관련된 몇 가지 계획 문제가 있습니다.
+
+
+CAUTION: NetApp 지원팀의 지시가 없는 한 ONTAP Select 가상 머신의 구성을 직접 수정해서는 안 됩니다. 가상 머신은 배포 관리 유틸리티를 통해서만 구성하고 수정해야 합니다. NetApp 지원팀의 도움 없이 배포 유틸리티를 사용하지 않고 ONTAP Select 가상 머신을 변경하면 가상 머신이 오류를 일으켜 사용할 수 없게 될 수 있습니다.
+
+하이퍼바이저 독립적:: ONTAP Select와 ONTAP Select Deploy 관리 유틸리티는 모두 하이퍼바이저에 독립적입니다. 다음 하이퍼바이저가 두 유틸리티 모두에서 지원됩니다.
++
+--
+* VMware ESXi
+* 커널 기반 가상 머신(KVM)
+
+
+--
+
+
+
+NOTE: ONTAP Select 9.14.1부터 KVM 하이퍼바이저에 대한 지원이 복원되었습니다. 이전에는 ONTAP Select 9.10.1에서 KVM 하이퍼바이저에 새 클러스터를 구축하는 기능에 대한 지원이 제거되었고, ONTAP Select 9.11.1에서는 오프라인으로 전환하거나 삭제하는 경우를 제외하고 기존 KVM 클러스터 및 호스트를 관리하는 기능에 대한 지원이 제거되었습니다.
+
+지원되는 플랫폼에 대한 자세한 내용은 하이퍼바이저별 계획 정보 및 link:reference_release_notes.html["릴리스 노트"]를 참조하십시오.
+
+ONTAP Select 노드 및 관리 유틸리티용 하이퍼바이저:: Deploy 관리 유틸리티와 ONTAP Select 노드는 모두 가상 머신으로 실행됩니다. Deploy 유틸리티에 사용할 하이퍼바이저는 ONTAP Select 노드에 사용할 하이퍼바이저와 독립적입니다. 이 둘을 페어링할 때 완벽한 유연성을 누릴 수 있습니다:
++
+--
+* VMware ESXi에서 실행되는 배포 유틸리티는 VMware ESXi 또는 KVM에서 ONTAP Select 클러스터를 생성하고 관리할 수 있습니다
+* KVM에서 실행되는 배포 유틸리티를 사용하여 VMware ESXi 또는 KVM 환경에서 ONTAP Select 클러스터를 생성하고 관리할 수 있습니다
+
+
+--
+호스트당 하나 이상의 ONTAP Select 노드 인스턴스:: 각 ONTAP Select 노드는 전용 가상 머신으로 실행됩니다. 동일한 하이퍼바이저 호스트에 여러 노드를 생성할 수 있지만 다음과 같은 제한 사항이 있습니다:
++
+--
+* 하나의 ONTAP Select 클러스터에 속한 여러 노드가 동일한 호스트에서 실행될 수 없습니다. 특정 호스트에 있는 모든 노드는 서로 다른 ONTAP Select 클러스터에 속해야 합니다.
+* 외부 스토리지를 사용해야 합니다.
+* 소프트웨어 RAID를 사용하는 경우 호스트에 ONTAP Select 노드를 하나만 배포할 수 있습니다.
+
+
+--
+클러스터 내 노드에 대한 하이퍼바이저 일관성:: ONTAP Select 클러스터 내의 모든 호스트는 동일한 버전 및 릴리스의 하이퍼바이저 소프트웨어를 실행해야 합니다.
+각 호스트의 물리적 포트 수:: 각 호스트가 하나, 둘 또는 네 개의 물리적 포트를 사용하도록 구성해야 합니다. 네트워크 포트 구성에는 유연성이 있지만, 가능한 한 다음 권장 사항을 따르십시오.
++
+--
+* 단일 노드 클러스터의 호스트에는 두 개의 물리적 포트가 있어야 합니다.
+* 다중 노드 클러스터의 각 호스트에는 4개의 물리적 포트가 있어야 합니다.
+
+
+--
+ONTAP Select를 ONTAP 하드웨어 기반 클러스터와 통합:: ONTAP Select 노드를 ONTAP 하드웨어 기반 클러스터에 직접 추가할 수는 없습니다. 하지만 선택적으로 ONTAP Select 클러스터와 하드웨어 기반 ONTAP 클러스터 간에 클러스터 피어링 관계를 설정할 수 있습니다.
+
+
+
+
+[[storage-considerations]]
+== 스토리지 고려 사항
+
+호스트 스토리지와 관련하여 고려해야 할 몇 가지 계획 사항이 있습니다.
+
+RAID 유형:: ESXi에서 DAS(Direct-Attached Storage)를 사용할 때는 로컬 하드웨어 RAID 컨트롤러를 사용할지, 아니면 ONTAP Select에 포함된 소프트웨어 RAID 기능을 사용할지 결정해야 합니다. 소프트웨어 RAID를 사용하는 경우 자세한 내용은 link:reference_plan_ots_storage.html["스토리지 및 RAID 고려 사항"]를 참조하십시오.
+로컬 스토리지:: RAID 컨트롤러로 관리되는 로컬 스토리지를 사용할 때는 다음 사항을 결정해야 합니다.
++
+--
+* RAID 그룹을 하나 또는 여러 개 사용할지 여부
+* 하나 또는 여러 개의 LUN 사용 여부
+
+
+--
+외부 스토리지:: ONTAP Select vNAS 솔루션을 사용할 때는 원격 데이터 저장소의 위치와 액세스 방법을 결정해야 합니다. ONTAP Select vNAS는 다음과 같은 구성을 지원합니다.
++
+--
+* VMware vSAN
+* 범용 외부 스토리지 어레이
+
+
+--
+필요한 스토리지 용량에 대한 추정치:: ONTAP Select 노드에 필요한 스토리지 용량을 확인해야 합니다. 이 정보는 스토리지 용량이 포함된 구매 라이센스를 취득하는 과정에서 필요합니다. 자세한 내용은 스토리지 용량 제한을 참조하십시오.
+
+
+
+NOTE: ONTAP Select 스토리지 용량은 ONTAP Select 가상 머신에 연결된 데이터 디스크의 총 허용 크기에 해당합니다.
+
+운영 구축을 위한 라이센스 모델:: 운영 환경에 구축된 각 ONTAP Select 클러스터에 대해 Capacity Tiers 또는 Capacity Pools 라이센스 모델을 선택해야 합니다. 자세한 내용은 _License_ 섹션을 참조하십시오.
+
+
+
+
+[[authentication-using-the-credential-store]]
+== 자격 증명 저장소를 사용한 인증
+
+ONTAP Select Deploy 자격 증명 저장소는 계정 정보를 저장하는 데이터베이스입니다. Deploy는 클러스터 생성 및 관리의 일환으로 호스트 인증을 수행하기 위해 계정 자격 증명을 사용합니다. ONTAP Select 배포를 계획할 때 자격 증명 저장소의 사용 방식을 숙지해야 합니다.
+
+
+NOTE: 계정 정보는 Advanced Encryption Standard(AES) 암호화 알고리즘과 SHA-256 해싱 알고리즘을 사용하여 데이터베이스에 안전하게 저장됩니다.
+
+자격 증명 유형:: 지원되는 자격 증명 유형은 다음과 같습니다.
++
+--
+* 호스트
++
+*호스트* 자격 증명은 ONTAP Select 노드를 ESXi 또는 KVM에 직접 배포하는 과정에서 하이퍼바이저 호스트를 인증하는 데 사용됩니다.
+
+* vcenter
++
+*vcenter* 자격 증명은 호스트가 VMware vCenter에서 관리될 때 ESXi에 ONTAP Select 노드를 구축하는 과정에서 vCenter 서버를 인증하는 데 사용됩니다.
+
+
+
+--
+액세스:: 자격 증명 저장소는 하이퍼바이저 호스트 추가와 같은 Deploy를 사용한 일반적인 관리 작업을 수행하는 과정에서 내부적으로 액세스됩니다. 또한 Deploy 웹 사용자 인터페이스 및 CLI를 통해 자격 증명 저장소를 직접 관리할 수도 있습니다.
+
+
+.관련 정보
+* link:reference_plan_ots_storage.html["스토리지 및 RAID 고려 사항"]
+

@@ -1,0 +1,339 @@
+---
+sidebar: sidebar 
+permalink: kvm-host-configuration-and-preparation-checklist.html 
+keywords: ontap select, pre-installation checklist, kvm, host preparation 
+summary: ONTAP Select 노드가 배포될 각 KVM 하이퍼바이저 호스트를 준비합니다. 호스트를 준비할 때 배포 환경을 신중하게 평가하여 호스트가 올바르게 구성되었고 ONTAP Select 클러스터 배포를 지원할 준비가 되었는지 확인하십시오. 
+---
+= ONTAP Select를 위한 KVM 호스트 준비
+:hardbreaks:
+:allow-uri-read: 
+:nofooter: 
+:icons: font
+:linkattrs: 
+:imagesdir: ./media/
+
+
+[role="lead"]
+ONTAP Select 노드가 배포될 각 KVM 하이퍼바이저 호스트를 준비하십시오. 호스트를 준비하는 동안 배포 환경을 신중하게 평가하여 호스트가 올바르게 구성되었고 ONTAP Select 클러스터 배포를 지원할 준비가 되었는지 확인합니다.
+
+
+NOTE: ONTAP Select Deploy 관리 유틸리티는 하이퍼바이저 호스트에 필요한 네트워크 및 스토리지 구성을 수행하지 않습니다. ONTAP Select 클러스터를 배포하기 전에 각 호스트를 수동으로 준비해야 합니다.
+
+
+
+[[step-1-prepare-the-kvm-hypervisor-host]]
+[[prepare-linux-server]]
+== 1단계: KVM 하이퍼바이저 호스트를 준비합니다.
+
+ONTAP Select 노드가 배포된 각 Linux KVM 서버를 준비해야 합니다. 또한 ONTAP Select Deploy 관리 유틸리티가 배포된 서버도 준비해야 합니다.
+
+.단계
+. Red Hat Enterprise Linux(RHEL)를 설치합니다.
++
+ISO 이미지를 사용하여 RHEL 운영 체제를 설치하십시오. 지원되는 RHEL 버전 목록은 link:reference_plan_ots_hardware.html#software-compatibility["하이퍼바이저의 소프트웨어 호환성 정보"]을 참조하십시오. 설치 중에 다음과 같이 시스템을 구성하십시오.
+
++
+.. 보안 정책으로 Default를 선택하십시오.
+.. 가상화 호스트 소프트웨어 옵션을 선택하십시오.
+.. 대상이 ONTAP Select에서 사용하는 RAID LUN이 아닌 로컬 부팅 디스크인지 확인합니다.
+.. 시스템 부팅 후 호스트 관리 인터페이스가 실행 중인지 확인하십시오.
++
+
+NOTE: /etc/sysconfig/network-scripts 경로에 있는 올바른 네트워크 구성 파일을 편집한 다음  `ifup` 명령을 사용하여 인터페이스를 활성화할 수 있습니다.
+
+
+
+. ONTAP Select에 필요한 추가 패키지를 설치합니다.
++
+ONTAP Select에는 몇 가지 추가 소프트웨어 패키지가 필요합니다. 정확한 패키지 목록은 사용 중인 Linux 버전에 따라 다릅니다. 먼저 서버에 yum 저장소가 있는지 확인하십시오. 저장소가 없으면 `wget your_repository_location` 명령을 사용하여 가져올 수 있습니다.
+
++
+
+NOTE: Linux 서버 설치 시 소프트웨어 선택에서 가상화 호스트를 선택했다면 필요한 패키지 중 일부가 이미 설치되어 있을 수 있습니다. link:https://docs.openvswitch.org/en/latest/intro/install/general/["Open vSwitch 문서"^]에 설명된 대로 소스 코드에서 openvswitch 패키지를 설치해야 할 수도 있습니다.
+
++
+필요한 패키지 및 기타 구성 요구 사항에 대한 자세한 내용은 link:https://imt.netapp.com/matrix/#welcome["상호운용성 매트릭스 도구"^]을 참조하십시오.
+
+. NVMe 디스크에 대한 PCI 패스스루를 구성합니다.
++
+구성에서 NVMe 디스크를 사용하는 경우 KVM 호스트가 ONTAP Select 클러스터에 로컬로 연결된 NVMe 디스크에 직접 액세스할 수 있도록 PCI 패스스루(DirectPath IO)를 구성해야 합니다. 다음 작업을 수행하려면 직접 액세스가 필요합니다.
+
++
+** link:task_chk_nvme_configure.html["NVMe 드라이브를 사용하도록 KVM 호스트를 구성합니다"]
+** link:concept_stor_swraid_local.html["클러스터를 배포한 후 소프트웨어 RAID를 사용하십시오"]
+
+
++
+KVM 하이퍼바이저에 대한 PCI 패스스루(DirectPath IO) 구성 방법에 대한 지침은 link:https://docs.redhat.com/en/documentation/red_hat_enterprise_linux/5/html/virtualization/chap-virtualization-pci_passthrough#sect-Virtualization-PCI_passthrough-AI_device_to_a_host["Red Hat 문서"^]를 참조하십시오.
+
+. 스토리지 풀을 구성합니다.
++
+ONTAP Select 스토리지 풀은 기본 물리적 스토리지를 추상화하는 논리적 데이터 컨테이너입니다. ONTAP Select가 배포된 KVM 호스트에서 스토리지 풀을 관리해야 합니다.
+
+
+
+
+
+[[step-2-create-a-storage-pool]]
+== 2단계: 스토리지 풀 생성
+
+각 ONTAP Select 노드에 최소 하나 이상의 스토리지 풀을 생성하십시오. 로컬 하드웨어 RAID 대신 소프트웨어 RAID를 사용하는 경우, 루트 및 데이터 애그리게이트용 스토리지 디스크가 노드에 연결됩니다. 이 경우에도 시스템 데이터용 스토리지 풀을 생성해야 합니다.
+
+.시작하기 전에
+ONTAP Select가 배포된 호스트에서 Linux CLI에 로그인할 수 있는지 확인하십시오.
+
+.이 작업 정보
+ONTAP Select Deploy 관리 유틸리티는 스토리지 풀의 대상 위치가 `/dev/<pool_name>`로 지정되어야 하며, 여기서 `<pool_name>`는 호스트의 고유한 풀 이름입니다.
+
+
+NOTE: 스토리지 풀이 생성될 때 LUN의 전체 용량이 할당됩니다.
+
+.단계
+. Linux 호스트에서 로컬 장치를 표시하고 스토리지 풀을 포함할 LUN을 선택합니다.
++
+[source, cli]
+----
+lsblk
+----
++
+적절한 LUN은 스토리지 용량이 가장 큰 디바이스일 가능성이 높습니다.
+
+. 디바이스에 스토리지 풀을 정의합니다.
++
+[source, cli]
+----
+virsh pool-define-as <pool_name> logical --source-dev <device_name> --target=/dev/<pool_name>
+----
++
+예를 들면 다음과 같습니다.
+
++
+[listing]
+----
+virsh pool-define-as select_pool logical --source-dev /dev/sdb --target=/dev/select_pool
+----
+. 스토리지 풀 구축:
++
+[source, cli]
+----
+virsh pool-build <pool_name>
+----
+. 스토리지 풀을 시작합니다.
++
+[source, cli]
+----
+virsh pool-start <pool_name>
+----
+. 시스템 부팅 시 스토리지 풀이 자동으로 시작되도록 구성합니다.
++
+[source, cli]
+----
+virsh pool-autostart <pool_name>
+----
+. 스토리지 풀이 생성되었는지 확인하십시오.
++
+[source, cli]
+----
+virsh pool-list
+----
+
+
+
+
+[[step-3-optionally-delete-a-storage-pool]]
+== 3단계: 선택적으로 스토리지 풀 삭제
+
+더 이상 필요하지 않은 스토리지 풀은 삭제할 수 있습니다.
+
+.시작하기 전에
+ONTAP Select가 배포된 Linux CLI에 로그인할 수 있는지 확인하십시오.
+
+.이 작업 정보
+ONTAP Select Deploy 관리 유틸리티는 스토리지 풀의 대상 위치가 `/dev/<pool_name>`로 지정되어야 하며, 여기서 `<pool_name>`는 호스트의 고유한 풀 이름입니다.
+
+.단계
+. 스토리지 풀이 정의되어 있는지 확인하십시오.
++
+[source, cli]
+----
+virsh pool-list
+----
+. 스토리지 풀을 삭제합니다.
++
+[source, cli]
+----
+virsh pool-destroy <pool_name>
+----
+. 비활성 스토리지 풀에 대한 구성을 정의 해제합니다.
++
+[source, cli]
+----
+virsh pool-undefine <pool_nanme>
+----
+. 호스트에서 스토리지 풀이 제거되었는지 확인하십시오.
++
+[source, cli]
+----
+virsh pool-list
+----
+. 스토리지 풀 볼륨 그룹의 모든 논리적 볼륨이 삭제되었는지 확인합니다.
++
+.. 논리 볼륨을 표시합니다.
++
+[source, cli]
+----
+lvs
+----
+.. 풀에 논리 볼륨이 있는 경우 삭제합니다.
++
+[source, cli]
+----
+lvremove <logical_volume_name>
+----
+
+
+. 볼륨 그룹이 삭제되었는지 확인합니다.
++
+.. 볼륨 그룹을 표시합니다.
++
+[source, cli]
+----
+vgs
+----
+.. 풀에 대한 볼륨 그룹이 있는 경우 삭제합니다.
++
+[source, cli]
+----
+vgremove <volume_group_name>
+----
+
+
+. 물리적 볼륨이 삭제되었는지 확인합니다.
++
+.. 물리적 볼륨을 표시합니다.
++
+[source, cli]
+----
+pvs
+----
+.. 풀에 물리적 볼륨이 있는 경우 삭제하십시오.
++
+[source, cli]
+----
+pvremove <physical_volume_name>
+----
+
+
+
+
+
+
+[[step-4-review-the-ontap-select-cluster-configuration]]
+== 4단계: ONTAP Select 클러스터 구성 검토
+
+ONTAP Select를 멀티 노드 클러스터 또는 단일 노드 클러스터로 구축할 수 있습니다. 많은 경우, 추가 스토리지 용량과 고가용성(HA) 기능 때문에 멀티노드 클러스터가 더 적합합니다.
+
+다음 그림은 ESXi 호스트에 대해 단일 노드 클러스터와 4개 노드 클러스터에서 사용되는 ONTAP Select 네트워크를 보여줍니다.
+
+[role="tabbed-block"]
+====
+.단일 노드 클러스터
+--
+다음 그림은 단일 노드 클러스터를 보여줍니다. 외부 네트워크는 클라이언트, 관리 및 클러스터 간 복제 트래픽(SnapMirror/SnapVault)을 전송합니다.
+
+image:CHK_01.jpg["하나의 네트워크를 보여주는 단일 노드 클러스터"]
+
+--
+.4노드 클러스터
+--
+다음 그림은 두 개의 네트워크를 보여주는 4개 노드 클러스터를 나타냅니다. 내부 네트워크는 ONTAP 클러스터 네트워크 서비스를 지원하기 위해 노드 간 통신을 가능하게 합니다. 외부 네트워크는 클라이언트, 관리 및 클러스터 간 복제 트래픽(SnapMirror/SnapVault)을 전송합니다.
+
+image:CHK_02.jpg["2개의 네트워크를 보여주는 4노드 클러스터"]
+
+--
+.4노드 클러스터 내의 단일 노드
+--
+다음 그림은 4노드 클러스터 내 단일 ONTAP Select 가상 머신의 일반적인 네트워크 구성을 보여줍니다. ONTAP 내부 네트워크와 ONTAP 외부 네트워크라는 두 개의 별도 네트워크가 있습니다.
+
+image:CHK_03.jpg["4노드 클러스터 내의 단일 노드"]
+
+--
+====
+
+
+[[step-5-configure-open-vswitch]]
+== 5단계: Open vSwitch 구성
+
+Open vSwitch를 사용하여 각 KVM 호스트 노드에 소프트웨어 정의 스위치를 구성하십시오.
+
+.시작하기 전에
+네트워크 관리자가 비활성화되어 있고 네이티브 Linux 네트워크 서비스가 활성화되어 있는지 확인하십시오.
+
+.이 작업 정보
+ONTAP Select에는 두 개의 별도 네트워크가 필요하며, 두 네트워크 모두 포트 본딩을 사용하여 네트워크에 HA 기능을 제공합니다.
+
+.단계
+. 호스트에서 Open vSwitch가 활성화되어 있는지 확인하십시오.
++
+.. Open vSwitch가 실행 중인지 확인합니다.
++
+[source, cli]
+----
+systemctl status openvswitch
+----
+.. Open vSwitch가 실행 중이 아니면 시작하십시오.
++
+[source, cli]
+----
+systemctl start openvswitch
+----
+
+
+. Open vSwitch 구성 표시:
++
+[source, cli]
+----
+ovs-vsctl show
+----
++
+호스트에 Open vSwitch가 아직 구성되어 있지 않으면 구성 화면이 비어 있는 것처럼 보입니다.
+
+. 새 vSwitch 인스턴스를 추가합니다.
++
+[source, cli]
+----
+ovs-vsctl add-br <bridge_name>
+----
++
+예를 들면 다음과 같습니다.
+
++
+[source, cli]
+----
+ovs-vsctl add-br ontap-br
+----
+. 네트워크 인터페이스를 종료합니다.
++
+[source, cli]
+----
+ifdown <interface_1>
+ifdown <interface_2>
+----
+. 링크 집합 제어 프로토콜(LACP)을 사용하여 링크를 결합합니다.
++
+[source, cli]
+----
+ovs-vsctl add-bond <internal_network> bond-br <interface_1> <interface_2> bond_mode=balance-slb lacp=active other_config:lacp-time=fast
+----
++
+
+NOTE: 인터페이스가 두 개 이상인 경우에만 본딩을 구성해야 합니다.
+
+. 네트워크 인터페이스를 활성화하십시오.
++
+[source, cli]
+----
+ifup <interface_1>
+ifup <interface_2>
+----
+

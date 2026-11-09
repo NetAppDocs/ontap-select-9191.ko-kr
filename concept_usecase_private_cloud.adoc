@@ -1,0 +1,27 @@
+---
+sidebar: sidebar 
+permalink: concept_usecase_private_cloud.html 
+keywords: ontap select, private cloud 
+summary: ONTAP Select는 조직 내 하나 이상의 프라이빗 클라우드를 지원하는 데 이상적입니다. 일반적인 사용 사례는 일반 서버를 기반으로 구축된 프라이빗 클라우드에 스토리지 서비스를 제공하는 것입니다. 
+---
+= ONTAP Select 프라이빗 클라우드 및 데이터 센터 지원
+:hardbreaks:
+:allow-uri-read: 
+:nofooter: 
+:icons: font
+:linkattrs: 
+:imagesdir: ./media/
+
+
+[role="lead"]
+ONTAP Select는 조직 내 하나 이상의 프라이빗 클라우드를 지원하는 데 이상적입니다. 일반적인 사용 사례는 일반 서버를 기반으로 구축된 프라이빗 클라우드에 스토리지 서비스를 제공하는 것입니다.
+
+퍼블릭 클라우드와 마찬가지로 프라이빗 클라우드는 유연성과 빠른 설치 및 해체를 제공합니다. 또한 프라이빗 클라우드는 향상된 보안 및 제어 기능을 제공합니다.
+
+다음 그림은 스토리지 팜이 ONTAP Select VM에 컴퓨팅 및 로컬 연결 스토리지를 제공하는 방식을 보여줍니다. ONTAP Select VM은 애플리케이션 스택에 업스트림 스토리지 서비스를 제공합니다. SVM 프로비저닝부터 애플리케이션 VM 배포 및 구성에 이르는 전체 워크플로는 프라이빗 클라우드 오케스트레이션 프레임워크를 통해 자동화됩니다.
+
+이는 서비스 지향적인 프라이빗 클라우드 모델입니다. ONTAP Select의 HA 버전을 사용하면 고가의 FAS 어레이에서 기대할 수 있는 것과 동일한 ONTAP 환경을 경험할 수 있습니다. 스토리지 서버 리소스는 ONTAP Select VM에서만 사용되며, 애플리케이션 VM은 별도의 물리적 인프라에서 호스팅됩니다.
+
+*DAS 기반 프라이빗 클라우드*
+
+image:PrivateCloud_01.jpg["DAS 기반 프라이빗 클라우드"]

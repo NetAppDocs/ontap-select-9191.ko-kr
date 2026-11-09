@@ -1,0 +1,45 @@
+---
+sidebar: sidebar 
+permalink: task_lic_acquire_ct.html 
+keywords: license, licensing, acquire, Capacity Tiers 
+summary: 용량 계층 라이선스를 사용하는 경우 각 ONTAP Select 노드에 대한 라이선스 파일을 확보해야 합니다. 라이선스 파일은 노드의 스토리지 용량을 정의하며 NetApp에서 할당한 고유한 9자리 일련 번호를 통해 노드에 잠깁니다. 
+---
+= ONTAP Select Capacity Tier 라이센스 취득
+:hardbreaks:
+:allow-uri-read: 
+:nofooter: 
+:icons: font
+:linkattrs: 
+:imagesdir: ./media/
+
+
+[role="lead"]
+용량 계층 라이선스를 사용하는 경우 각 ONTAP Select 노드에 대한 라이선스 파일을 확보해야 합니다. 라이선스 파일은 노드의 스토리지 용량을 정의하며 NetApp에서 할당한 고유한 9자리 일련 번호를 통해 노드에 잠깁니다.
+
+.시작하기 전에
+* NetApp에서 ONTAP Select 노드에 할당한 9자리 라이센스 일련 번호가 있어야 합니다.
+* 구매 주문서 발송일로부터 최소 24시간이 지난 후에 라이센스 파일을 받으실 수 있습니다.
+* link:sizing-capacity-tier-license.html["Capacity Tiers 라이선스 크기 조정 시 고려 사항"]를 검토했습니다.
+
+
+.이 작업 정보
+Capacity Tiers 라이선스가 필요한 각 ONTAP Select 노드에 대해 이 작업을 수행해야 합니다.
+
+.단계
+. link:https://register.netapp.com/register/getlicensefile["ONTAP Select 라이선스 사이트에 액세스"^].
+. NetApp 계정 자격 증명을 사용하여 로그인하십시오.
+. *License Generator* 페이지의 드롭다운 상자에서 원하는 라이센스 오퍼링을 선택합니다.
+. *제품 일련 번호*를 포함하여 *라이선스 생성기* 페이지의 나머지 필드를 입력하십시오.
++
+"제품 일련 번호"는 ONTAP Select 노드의 일련 번호입니다.
+
+. *Submit*을 선택합니다.
+. 요청이 검증되면 라이센스 배송 방법을 선택하십시오.
++
+*Download License* 또는 *Email License* 중 하나를 선택할 수 있습니다.
+
+. 선택한 배송 방법에 따라 라이센스 파일을 받았는지 확인하십시오.
+
+
+.완료한 후
+ONTAP Select 노드에 라이선스를 적용하려면 먼저 Deploy 관리 유틸리티에 라이선스 파일을 업로드해야 합니다.

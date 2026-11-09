@@ -1,0 +1,191 @@
+---
+sidebar: sidebar 
+permalink: concept_stor_concepts_chars.html 
+keywords: ontap select, storage concepts 
+summary: 특정 스토리지 구성 요소를 살펴보기 전에 ONTAP Select 환경에 적용되는 일반적인 스토리지 개념을 살펴보십시오. 
+---
+= ONTAP Select의 일반 스토리지 특성에 대해 알아보십시오
+:hardbreaks:
+:allow-uri-read: 
+:nofooter: 
+:icons: font
+:linkattrs: 
+:imagesdir: ./media/
+
+
+[role="lead"]
+특정 스토리지 구성 요소를 살펴보기 전에 ONTAP Select 환경에 적용되는 일반적인 스토리지 개념을 살펴보십시오.
+
+
+
+[[phases-of-storage-configuration]]
+== 스토리지 구성 단계
+
+ONTAP Select 호스트 스토리지의 주요 구성 단계는 다음과 같습니다.
+
+* 배포 전 사전 요구 사항
++
+** 각 하이퍼바이저 호스트가 ONTAP Select 배포를 위해 구성되고 준비되었는지 확인하십시오.
+** 구성에는 물리적 드라이브, RAID 컨트롤러 및 그룹, LUN, 그리고 관련 네트워크 준비가 포함됩니다.
+** 이 구성은 ONTAP Select 외부에서 수행됩니다.
+
+
+* 하이퍼바이저 관리자 유틸리티를 사용한 구성
++
+** 하이퍼바이저 관리 유틸리티(예: VMware 환경의 vSphere)를 사용하여 스토리지의 특정 측면을 구성할 수 있습니다.
+** 이 구성은 ONTAP Select 외부에서 수행됩니다.
+
+
+* ONTAP Select Deploy 관리 유틸리티를 사용한 구성
++
+** Deploy 관리 유틸리티를 사용하여 핵심 논리 스토리지 구조를 구성할 수 있습니다.
+** 이 작업은 CLI 명령을 통해 명시적으로 수행되거나 배포의 일부로 유틸리티에 의해 자동으로 수행됩니다.
+
+
+* 배포 후 구성
++
+** ONTAP Select 배포가 완료되면 ONTAP CLI 또는 System Manager를 사용하여 클러스터를 구성할 수 있습니다.
+** 이 구성은 ONTAP Select Deploy 외부에서 수행됩니다.
+
+
+
+
+
+
+[[managed-versus-unmanaged-storage]]
+== 관리형 스토리지와 비관리형 스토리지
+
+ONTAP Select에서 액세스하고 직접 제어하는 스토리지는 관리형 스토리지입니다. 동일한 하이퍼바이저 호스트의 다른 모든 스토리지는 비관리형 스토리지입니다.
+
+
+
+[[homogeneous-physical-storage]]
+=== 동종 물리적 스토리지
+
+ONTAP Select 관리형 스토리지를 구성하는 모든 물리적 드라이브는 동질적이어야 합니다. 즉, 모든 하드웨어는 다음과 같은 특성에 있어 동일해야 합니다.
+
+* 유형(SAS, NL-SAS, SATA, SSD)
+* 속도(RPM)
+
+
+
+
+[[illustration-of-the-local-storage-environment]]
+== 로컬 스토리지 환경의 그림
+
+각 하이퍼바이저 호스트에는 ONTAP Select에서 사용할 수 있는 로컬 디스크 및 기타 논리적 스토리지 구성 요소가 포함되어 있습니다. 이러한 스토리지 구성 요소는 물리적 디스크부터 시작하여 계층 구조로 구성됩니다.
+
+image:ST_01.jpg["로컬 스토리지 환경"]
+
+
+
+[[characteristics-of-the-local-storage-components]]
+=== 로컬 스토리지 구성 요소의 특성
+
+ONTAP Select 환경에서 사용되는 로컬 스토리지 구성 요소에 적용되는 몇 가지 개념이 있습니다. ONTAP Select 구축을 준비하기 전에 이러한 개념을 숙지해야 합니다. 이러한 개념은 RAID 그룹 및 LUN, 스토리지 풀, 가상 디스크의 범주에 따라 정리되어 있습니다.
+
+
+
+==== 물리적 드라이브를 RAID 그룹 및 LUN으로 그룹화
+
+하나 이상의 물리적 디스크를 호스트 서버에 로컬로 연결하여 ONTAP Select에서 사용할 수 있습니다. 이러한 물리적 디스크는 RAID 그룹에 할당되며, 해당 그룹은 하나 이상의 LUN으로 하이퍼바이저 호스트 운영 체제에 제공됩니다. 각 LUN은 하이퍼바이저 호스트 운영 체제에 물리적 하드 드라이브로 인식됩니다.
+
+ONTAP Select 호스트를 구성할 때 다음 사항에 유의해야 합니다.
+
+* 관리되는 모든 스토리지는 단일 RAID 컨트롤러를 통해 액세스할 수 있어야 합니다.
+* 제조사에 따라 각 RAID 컨트롤러는 RAID 그룹당 최대 드라이브 수를 지원합니다
+
+
+
+
+==== 하나 이상의 RAID 그룹
+
+각 ONTAP Select 호스트에는 하나의 RAID 컨트롤러가 있어야 합니다. ONTAP Select에 대해 단일 RAID 그룹을 생성해야 합니다. 하지만 특정 상황에서는 둘 이상의 RAID 그룹 생성을 고려할 수 있습니다. link:reference_plan_best_practices.html["모범 사례 요약"]을(를) 참조하십시오.
+
+
+
+[[storage-pool-considerations]]
+=== 스토리지 풀 고려 사항
+
+ONTAP Select 배포를 준비하는 과정에서 알아야 할 스토리지 풀과 관련된 몇 가지 문제가 있습니다.
+
+
+NOTE: VMware 환경에서 스토리지 풀은 VMware 데이터 저장소와 동의어입니다.
+
+
+
+==== 스토리지 풀 및 LUN
+
+각 LUN은 하이퍼바이저 호스트에서 로컬 디스크로 인식되며 하나의 스토리지 풀의 일부가 될 수 있습니다. 각 스토리지 풀은 하이퍼바이저 호스트 OS에서 사용할 수 있는 파일 시스템으로 포맷됩니다.
+
+ONTAP Select 배포의 일부로 스토리지 풀이 올바르게 생성되었는지 확인해야 합니다. 하이퍼바이저 관리 툴을 사용하여 스토리지 풀을 생성할 수 있습니다. 예를 들어 VMware의 경우 vSphere 클라이언트를 사용하여 스토리지 풀을 생성할 수 있습니다. 그런 다음 스토리지 풀이 ONTAP Select Deploy 관리 유틸리티로 전달됩니다.
+
+
+
+[[manage-the-virtual-disks-on-esxi]]
+=== ESXi에서 가상 디스크 관리
+
+ONTAP Select 배포를 준비하는 과정에서 알아야 할 가상 디스크와 관련된 몇 가지 문제가 있습니다.
+
+
+
+==== 가상 디스크 및 파일 시스템
+
+ONTAP Select 가상 머신에는 여러 개의 가상 디스크 드라이브가 할당됩니다. 각 가상 디스크는 실제로 스토리지 풀에 포함된 파일이며 하이퍼바이저에 의해 유지 관리됩니다. ONTAP Select에서 사용하는 디스크에는 주로 시스템 디스크와 데이터 디스크 등 여러 유형이 있습니다.
+
+가상 디스크와 관련하여 다음 사항도 유의해야 합니다.
+
+* 가상 디스크를 생성하기 전에 스토리지 풀을 사용할 수 있어야 합니다.
+* 가상 디스크는 가상 머신이 생성되기 전에는 생성할 수 없습니다.
+* 모든 가상 디스크를 생성하려면 ONTAP Select Deploy 관리 유틸리티를 사용해야 합니다(즉, 관리자가 Deploy 유틸리티 외부에서 가상 디스크를 생성해서는 안 됩니다).
+
+
+
+
+==== 가상 디스크 구성
+
+가상 디스크는 ONTAP Select에서 관리됩니다. 배포 관리 유틸리티를 사용하여 클러스터를 생성할 때 자동으로 생성됩니다.
+
+
+
+[[illustration-of-the-external-storage-environment-on-esxi]]
+== ESXi의 외부 스토리지 환경 그림
+
+ONTAP Select vNAS 솔루션을 사용하면 ONTAP Select에서 하이퍼바이저 호스트 외부에 있는 스토리지의 데이터 저장소를 사용할 수 있습니다. 이러한 데이터 저장소는 VMware vSAN을 사용하여 네트워크를 통해 액세스하거나 외부 스토리지 어레이에서 직접 액세스할 수 있습니다.
+
+ONTAP Select는 하이퍼바이저 호스트 외부에 있는 다음과 같은 유형의 VMware ESXi 네트워크 데이터스토어를 사용하도록 구성할 수 있습니다.
+
+* vSAN(Virtual SAN)
+* VMFS
+* NFS
+
+
+
+
+[[vsan-datastores]]
+=== vSAN 데이터 저장소
+
+모든 ESXi 호스트는 하나 이상의 로컬 VMFS 데이터 저장소를 가질 수 있습니다. 일반적으로 이러한 데이터 저장소는 로컬 호스트에서만 액세스할 수 있습니다. 그러나 VMware vSAN을 사용하면 ESXi 클러스터의 각 호스트가 클러스터의 모든 데이터 저장소를 로컬인 것처럼 공유할 수 있습니다. 다음 그림은 vSAN이 ESXi 클러스터의 호스트 간에 공유되는 데이터 저장소 풀을 생성하는 방법을 보여줍니다.
+
+image:ST_02.jpg["ESXi 클러스터"]
+
+
+
+[[vmfs-datastore-on-external-storage-array]]
+=== 외부 스토리지 어레이의 VMFS 데이터 저장소
+
+외부 스토리지 어레이에 상주하는 VMFS 데이터스토어를 생성할 수 있습니다. 스토리지는 여러 다양한 네트워크 프로토콜 중 하나를 사용하여 액세스됩니다. 다음 그림은 iSCSI 프로토콜을 사용하여 액세스되는 외부 스토리지 어레이의 VMFS 데이터스토어를 보여줍니다.
+
+
+NOTE: ONTAP Select는 iSCSI, Fiber Channel 및 Fiber Channel over Ethernet을 포함하여 VMware 스토리지/SAN 호환성 문서에 설명된 모든 외부 스토리지 어레이를 지원합니다.
+
+image:ST_03.jpg["ESXi 하이퍼바이저 호스트"]
+
+
+
+[[nfs-datastore-on-external-storage-array]]
+=== 외부 스토리지 어레이의 NFS 데이터 저장소
+
+외부 스토리지 어레이에 NFS 데이터스토어를 생성할 수 있습니다. 이 스토리지는 NFS 네트워크 프로토콜을 사용하여 액세스됩니다. 다음 그림은 NFS 서버 어플라이언스를 통해 액세스되는 외부 스토리지의 NFS 데이터스토어를 보여줍니다.
+
+image:ST_04.jpg["ESXi 하이퍼바이저 호스트"]

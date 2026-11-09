@@ -1,0 +1,69 @@
+---
+sidebar: sidebar 
+permalink: concept_lic_production.html 
+keywords: license, licensing, production, purchased, standard, premium, premium xl 
+summary: ONTAP Select가 조직에 적합하다고 판단되면 운영 구축을 지원하는 데 필요한 라이센스를 구입할 수 있습니다. 각 구축에 대해 Capacity Tiers 또는 Capacity Pools 라이센스 모델과 스토리지 용량을 선택해야 합니다. 
+---
+= 운영 구축을 위해 구매한 ONTAP Select 라이센스에 대해 알아보십시오
+:hardbreaks:
+:allow-uri-read: 
+:nofooter: 
+:icons: font
+:linkattrs: 
+:imagesdir: ./media/
+
+
+[role="lead"]
+ONTAP Select가 조직에 적합하다고 판단되면 운영 구축을 지원하는 데 필요한 라이센스를 구입할 수 있습니다. 각 구축에 대해 용량 풀 또는 용량 계층 라이센스 모델과 스토리지 용량을 선택해야 합니다.
+
+
+
+[[common-licensing-characteristics]]
+== 일반적인 라이센스 특성
+
+_Capacity Pools_ 및 _Capacity Tiers_ 라이센스 모델은 여러 면에서 매우 다릅니다. 하지만 두 라이센스 모델은 다음을 포함한 몇 가지 공통적인 특성을 공유합니다.
+
+* 운영 환경에 ONTAP Select를 구축할 때 필요에 따라 하나 이상의 라이센스를 구입해야 합니다.
+* 라이센스의 스토리지 용량은 1TB 단위로 할당됩니다.
+* 모든 플랫폼 라이센스 유형(표준, 프리미엄 및 프리미엄 XL)이 지원됩니다.
+* 필요한 라이센스를 취득할 때 도움이 필요하면 NetApp 계정 담당 팀이나 파트너에게 문의하십시오.
+* 라이센스 파일을 Deploy 관리 유틸리티에 업로드해야 하며, 그러면 유틸리티가 라이센스 모델을 기반으로 라이센스를 적용합니다.
+* 라이센스를 설치하고 적용한 후에는 NetApp 계정 팀이나 파트너에게 연락하여 업데이트된 라이센스를 구매함으로써 용량을 추가할 수 있습니다.
+* 구매한 라이센스로 처음 배포된 ONTAP Select 노드는 평가판 라이센스로 전환할 수 없습니다.
+
+
+
+
+[[capacity-tiers-licensing-model]]
+== 용량 계층 라이센스 모델
+
+Capacity Tiers 라이센스 모델에는 다음과 같은 몇 가지 고유한 특징이 있습니다.
+
+* 각 ONTAP Select 노드에 대한 라이센스를 구매해야 합니다.
+* 최소 구매량은 1TB입니다.
+* 각 용량 등급 라이센스는 스토리지 용량을 가지며 특정 노드에 고정됩니다.
+* 스토리지 용량은 원시 용량을 나타내며 ONTAP Select 가상 머신에서 사용할 수 있는 데이터 디스크의 총 허용 크기에 해당합니다.
+* NetApp은 각 ONTAP Select 노드에 대해 9자리 라이센스 일련 번호를 생성합니다.
+* 노드에 할당된 스토리지는 영구적이므로 갱신이 필요 없지만, 라이센스와 연결된 지원 계약은 갱신해야 합니다.
+* 고가용성(HA) 쌍의 각 ONTAP Select 노드에는 해당 노드에 연결된 원시 스토리지만큼 큰 라이센스가 필요합니다.
+* 노드 일련 번호는 9자리 숫자이며 라이센스 일련 번호와 동일합니다.
+* 클러스터 구축 중에 또는 클러스터 생성 후 30일 이내에 라이센스 파일을 적용할 수 있습니다.
+
+
+
+
+[[capacity-pools-licensing-model]]
+== Capacity Pools 라이센스 모델
+
+Capacity Pools 라이센스 모델에는 다음과 같은 몇 가지 고유한 특징이 있습니다.
+
+* 각 공유 Capacity Pool에 대한 라이센스를 구매해야 합니다.
+* 최소 구매량은 2TB입니다.
+* 각 용량 풀 라이센스는 스토리지 용량을 가지며 Deploy 관리 유틸리티 내의 특정 License Manager 인스턴스에 고정됩니다.
+* 스토리지 용량은 원시 용량을 나타내며 ONTAP Select 가상 머신에서 생성할 수 있는 데이터 애그리게이트의 총 허용 크기에 해당합니다.
+* NetApp은 각 용량 풀에 대해 9자리 라이센스 일련 번호를 생성합니다.
+* Capacity Pool에 할당된 스토리지는 구매를 기준으로 특정 기간 동안만 유효합니다(갱신 필요).
+* License Manager는 Capacity Pool 라이센스 일련 번호를 기반으로 20자리 노드 일련 번호를 생성합니다.
+* 클러스터의 모든 ONTAP Select 노드는 동일한 라이센스 용량을 공유합니다. 즉, 라이센스는 클러스터의 모든 노드에 할당된 스토리지를 제공할 수 있을 만큼 충분히 커야 합니다.
+* 각 노드는 공유 용량 풀에서 로컬 데이터 애그리게이트를 위한 스토리지 용량을 자동으로 임대합니다.
+

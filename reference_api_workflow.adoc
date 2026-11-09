@@ -1,0 +1,420 @@
+---
+sidebar: sidebar 
+permalink: reference_api_workflow.html 
+keywords: rest api, deploy rest api, rest, workflow, create cluster, curl, json 
+summary: vCenter에서 관리하는 VMware ESXi 호스트에 단일 노드 ONTAP Select 클러스터를 구축할 수 있습니다. 
+---
+= ESXi에서 ONTAP Select 단일 노드 평가 클러스터 생성
+:hardbreaks:
+:allow-uri-read: 
+:nofooter: 
+:icons: font
+:linkattrs: 
+:imagesdir: ./media/
+
+
+[role="lead"]
+vCenter에서 관리하는 VMware ESXi 호스트에 단일 노드 ONTAP Select 클러스터를 구축할 수 있습니다. 클러스터는 평가판 라이선스로 생성됩니다.
+
+클러스터 생성 워크플로는 다음과 같은 상황에서 다릅니다.
+
+* ESXi 호스트는 vCenter에서 관리되지 않습니다(독립 실행형 호스트).
+* 클러스터 내에는 여러 개의 노드 또는 호스트가 사용됩니다.
+* 클러스터가 구매한 라이선스를 사용하여 운영 환경에 배포되었습니다.
+* VMware ESXi 대신 KVM 하이퍼바이저가 사용됩니다.
+
+
+
+
+[[step-1-register-vcenter-server-credential]]
+== 1단계: vCenter 서버 자격 증명 등록
+
+vCenter 서버에서 관리하는 ESXi 호스트에 배포할 때는 호스트를 등록하기 전에 자격 증명을 추가해야 합니다. 그러면 Deploy 관리 유틸리티가 해당 자격 증명을 사용하여 vCenter에 인증할 수 있습니다.
+
+[cols="15,15,70"]
+|===
+| 범주 | HTTP 동사 | 경로 
+
+
+| 배포 | POST | /security/credentials 
+|===
+Curl::
+
+
+[source, curl]
+----
+curl -iX POST -H 'Content-Type: application/json' -u admin:<password> -k -d @step01 'https://10.21.191.150/api/security/credentials'
+----
+JSON 입력 (step01)::
+
+
+[source, json]
+----
+{
+  "hostname": "vcenter.company-demo.com",
+  "type": "vcenter",
+  "username": "misteradmin@vsphere.local",
+  "password": "mypassword"
+}
+----
+처리 유형:: 비동기
+출력::
++
+--
+* 위치 응답 헤더의 자격 증명 ID
+* 작업 객체
+
+
+--
+
+
+
+
+[[step-2-register-a-hypervisor-host]]
+== 2단계: 하이퍼바이저 호스트 등록
+
+ONTAP Select 노드가 포함된 가상 머신이 실행될 하이퍼바이저 호스트를 추가합니다.
+
+[cols="15,15,70"]
+|===
+| 범주 | HTTP 동사 | 경로 
+
+
+| 클러스터 | POST | /hosts 
+|===
+Curl::
+
+
+[source, curl]
+----
+curl -iX POST -H 'Content-Type: application/json' -u admin:<password> -k -d @step02 'https://10.21.191.150/api/hosts'
+----
+JSON 입력 (step02)::
+
+
+[source, json]
+----
+{
+  "hosts": [
+    {
+      "hypervisor_type": "ESX",
+      "management_server": "vcenter.company-demo.com",
+      "name": "esx1.company-demo.com"
+    }
+  ]
+}
+----
+처리 유형:: 비동기
+출력::
++
+--
+* 위치 응답 헤더의 호스트 ID
+* 작업 객체
+
+
+--
+
+
+
+
+[[step-3-create-a-cluster]]
+== 3단계: 클러스터 생성
+
+ONTAP Select 클러스터를 생성하면 기본 클러스터 구성이 등록되고 Deploy에서 노드 이름을 자동으로 생성합니다.
+
+[cols="15,15,70"]
+|===
+| 범주 | HTTP 동사 | 경로 
+
+
+| 클러스터 | POST | /clusters 
+|===
+Curl:: 단일 노드 클러스터의 경우 쿼리 매개 변수 node_count를 1로 설정해야 합니다.
+
+
+[source, curl]
+----
+curl -iX POST -H 'Content-Type: application/json' -u admin:<password> -k -d @step03 'https://10.21.191.150/api/clusters? node_count=1'
+----
+JSON 입력 (step03)::
+
+
+[source, json]
+----
+{
+  "name": "my_cluster"
+}
+----
+처리 유형:: 동기식
+출력::
++
+--
+* 위치 응답 헤더의 클러스터 ID
+
+
+--
+
+
+
+
+[[step-4-configure-the-cluster]]
+== 4단계: 클러스터 구성
+
+클러스터를 구성하는 과정에서 다음 속성을 반드시 제공해야 합니다.
+
+[cols="15,15,70"]
+|===
+| 범주 | HTTP 동사 | 경로 
+
+
+| 클러스터 | PATCH | /클러스터/{cluster_id} 
+|===
+Curl:: 클러스터 ID를 제공하십시오.
+
+
+[source, curl]
+----
+curl -iX PATCH -H 'Content-Type: application/json' -u admin:<password> -k -d @step04 'https://10.21.191.150/api/clusters/CLUSTERID'
+----
+JSON 입력 (step04)::
+
+
+[source, json]
+----
+{
+  "dns_info": {
+    "domains": ["lab1.company-demo.com"],
+    "dns_ips": ["10.206.80.135", "10.206.80.136"]
+    },
+    "ontap_image_version": "9.5",
+    "gateway": "10.206.80.1",
+    "ip": "10.206.80.115",
+    "netmask": "255.255.255.192",
+    "ntp_servers": {"10.206.80.183"}
+}
+----
+처리 유형:: 동기식
+출력:: None
+
+
+
+
+[[step-5-retrieve-the-node-name]]
+== 5단계: 노드 이름 검색
+
+Deploy 관리 유틸리티는 클러스터를 생성할 때 노드 식별자와 이름을 자동으로 생성합니다. 노드를 구성하기 전에 할당된 ID를 검색해야 합니다.
+
+[cols="15,15,70"]
+|===
+| 범주 | HTTP 동사 | 경로 
+
+
+| 클러스터 | GET | /clusters/{cluster_id}/nodes 
+|===
+Curl:: 클러스터 ID를 제공하십시오.
+
+
+[source, curl]
+----
+curl -iX GET -u admin:<password> -k 'https://10.21.191.150/api/clusters/CLUSTERID/nodes?fields=id,name'
+----
+처리 유형:: 동기식
+출력::
++
+--
+* 고유 ID와 이름을 가진 단일 노드를 각각 설명하는 배열 레코드
+
+
+--
+
+
+
+
+[[step-6-configure-the-nodes]]
+== 6단계: 노드 구성
+
+노드에 대한 기본 구성을 제공합니다. 이는 노드를 구성하는 데 사용되는 세 가지 API 호출 중 첫 번째입니다.
+
+[cols="15,15,70"]
+|===
+| 범주 | HTTP 동사 | 경로 
+
+
+| 클러스터 | PATH | /클러스터/{cluster_id}/노드/{node_id} 
+|===
+Curl:: 클러스터 ID와 노드 ID를 제공하십시오.
+
+
+[source, curl]
+----
+curl -iX PATCH -H 'Content-Type: application/json' -u admin:<password> -k -d @step06 'https://10.21.191.150/api/clusters/CLUSTERID/nodes/NODEID'
+----
+JSON 입력 (step06):: ONTAP Select 노드가 실행될 호스트 ID를 제공하십시오.
+
+
+[source, json]
+----
+{
+  "host": {
+    "id": "HOSTID"
+    },
+  "instance_type": "small",
+  "ip": "10.206.80.101",
+  "passthrough_disks": false
+}
+----
+처리 유형:: 동기식
+출력:: None
+
+
+
+
+[[step-7-retrieve-the-node-networks]]
+== 7단계: 노드 네트워크 검색
+
+단일 노드 클러스터의 노드에서 사용하는 데이터 및 관리 네트워크를 식별합니다. 내부 네트워크는 단일 노드 클러스터에서 사용되지 않습니다.
+
+[cols="15,15,70"]
+|===
+| 범주 | HTTP 동사 | 경로 
+
+
+| 클러스터 | GET | /클러스터/{cluster_id}/노드/{node_id}/네트워크 
+|===
+Curl:: 클러스터 ID와 노드 ID를 제공하십시오.
+
+
+[source, curl]
+----
+curl -iX GET -u admin:<password> -k 'https://10.21.191.150/api/ clusters/CLUSTERID/nodes/NODEID/networks?fields=id,purpose'
+----
+처리 유형:: 동기식
+출력::
++
+--
+* 고유 ID 및 용도를 포함하여 노드의 단일 네트워크를 각각 설명하는 두 개의 레코드 배열
+
+
+--
+
+
+
+
+[[step-8-configure-the-node-networking]]
+== 8단계: 노드 네트워킹 구성
+
+데이터 및 관리 네트워크를 구성하십시오. 내부 네트워크는 단일 노드 클러스터에서 사용되지 않습니다.
+
+
+NOTE: 다음 API 호출을 네트워크별로 한 번씩, 총 두 번 실행하십시오.
+
+[cols="15,15,70"]
+|===
+| 범주 | HTTP 동사 | 경로 
+
+
+| 클러스터 | PATCH | /클러스터/{cluster_id}/노드/{node_id}/네트워크/{network_id} 
+|===
+Curl:: 클러스터 ID, 노드 ID 및 네트워크 ID를 제공하십시오.
+
+
+[source, curl]
+----
+curl -iX PATCH -H 'Content-Type: application/json' -u admin:<password> -k -d @step08 'https://10.21.191.150/api/clusters/ CLUSTERID/nodes/NODEID/networks/NETWORKID'
+----
+JSON 입력(step08):: 네트워크 이름을 입력하십시오.
+
+
+[source, json]
+----
+{
+  "name": "sDOT_Network"
+}
+----
+처리 유형:: 동기식
+출력:: None
+
+
+
+
+[[step-9-configure-the-node-storage-pool]]
+== 9단계: 노드 스토리지 풀 구성
+
+노드 구성의 마지막 단계는 스토리지 풀을 연결하는 것입니다. vSphere 웹 클라이언트를 통해 또는 선택적으로 Deploy REST API를 통해 사용 가능한 스토리지 풀을 확인할 수 있습니다.
+
+[cols="15,15,70"]
+|===
+| 범주 | HTTP 동사 | 경로 
+
+
+| 클러스터 | PATCH | /클러스터/{cluster_id}/노드/{node_id}/네트워크/{network_id} 
+|===
+Curl:: 클러스터 ID, 노드 ID 및 네트워크 ID를 제공하십시오.
+
+
+[source, curl]
+----
+curl -iX PATCH -H 'Content-Type: application/json' -u admin:<password> -k -d @step09 'https://10.21.191.150/api/clusters/ CLUSTERID/nodes/NODEID'
+----
+JSON 입력 (step09):: 풀 용량은 2TB입니다.
+
+
+[source, json]
+----
+{
+  "pool_array": [
+    {
+      "name": "sDOT-01",
+      "capacity": 2147483648000
+    }
+  ]
+}
+----
+처리 유형:: 동기식
+출력:: None
+
+
+
+
+[[step-10-deploy-the-cluster]]
+== 10단계: 클러스터 배포
+
+클러스터와 노드 구성이 완료되면 클러스터를 배포할 수 있습니다.
+
+[cols="15,15,70"]
+|===
+| 범주 | HTTP 동사 | 경로 
+
+
+| 클러스터 | POST | /clusters/{cluster_id}/deploy 
+|===
+Curl:: 클러스터 ID를 제공하십시오.
+
+
+[source, curl]
+----
+curl -iX POST -H 'Content-Type: application/json' -u admin:<password> -k -d @step10 'https://10.21.191.150/api/clusters/CLUSTERID/deploy'
+----
+JSON 입력(10단계):: ONTAP 관리자 계정의 비밀번호를 입력하십시오.
+
+
+[source, json]
+----
+{
+  "ontap_credentials": {
+    "password": "mypassword"
+  }
+}
+----
+처리 유형:: 비동기
+출력::
++
+--
+* 작업 객체
+
+
+--
+
+
+.관련 정보
+link:deploy-evaluation-ontap-select-ovf-template.html["ONTAP Select 클러스터의 90일 평가판 인스턴스 배포"]

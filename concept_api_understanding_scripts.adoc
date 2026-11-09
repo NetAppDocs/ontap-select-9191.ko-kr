@@ -1,0 +1,80 @@
+---
+sidebar: sidebar 
+permalink: concept_api_understanding_scripts.html 
+keywords: rest api, deploy rest api, rest, python, python scripts, understanding 
+summary: 샘플 Python 스크립트를 사용하면 여러 가지 작업을 수행할 수 있습니다. 실제 Deploy 인스턴스에서 사용하기 전에 스크립트를 이해해야 합니다. 
+---
+= ONTAP Select Deploy용 Python 스크립트에 대해 알아보세요.
+:hardbreaks:
+:allow-uri-read: 
+:nofooter: 
+:icons: font
+:linkattrs: 
+:imagesdir: ./media/
+
+
+[role="lead"]
+샘플 Python 스크립트를 사용하면 여러 가지 작업을 수행할 수 있습니다. 실제 Deploy 인스턴스에서 사용하기 전에 스크립트를 이해해야 합니다.
+
+
+
+[[common-design-characteristics]]
+== 일반적인 설계 특성
+
+이 스크립트는 다음과 같은 공통 특성을 갖도록 설계되었습니다.
+
+* 클라이언트 시스템의 명령줄 인터페이스에서 실행 적절하게 구성된 클라이언트 시스템에서 Python 스크립트를 실행할 수 있습니다. 자세한 내용은 _시작하기 전에_를 참조하십시오.
+* CLI 입력 매개 변수 수락 각 스크립트는 입력 매개 변수를 통해 CLI에서 제어됩니다.
+* 입력 파일 읽기 각 스크립트는 목적에 따라 입력 파일을 읽습니다. 클러스터를 생성하거나 삭제할 때는 JSON 구성 파일을 제공해야 합니다. 노드 라이센스를 추가할 때는 유효한 라이센스 파일을 제공해야 합니다.
+* 공통 지원 모듈 사용 공통 지원 모듈 _deploy_requests.py_에는 단일 클래스가 포함되어 있습니다. 이 클래스는 각 스크립트에서 가져와 사용됩니다.
+
+
+
+
+[[create-a-cluster]]
+== 클러스터 생성
+
+cluster.py 스크립트를 사용하여 ONTAP Select 클러스터를 생성할 수 있습니다. CLI 매개변수와 JSON 입력 파일의 내용을 기반으로 배포 환경에 맞게 스크립트를 다음과 같이 수정할 수 있습니다.
+
+* 하이퍼바이저 배포는 ESXi 또는 KVM(배포 릴리스에 따라 다름)에 할 수 있습니다. ESXi에 배포하는 경우 하이퍼바이저는 vCenter에서 관리하거나 독립형 호스트로 구성할 수 있습니다.
+* 클러스터 크기 단일 노드 또는 다중 노드 클러스터를 배포할 수 있습니다.
+* 평가판 또는 프로덕션 라이센스 평가판 또는 구매한 프로덕션 라이센스를 사용하여 클러스터를 배포할 수 있습니다.
+
+
+스크립트의 CLI 입력 매개변수는 다음과 같습니다.
+
+* Deploy 서버의 호스트 이름 또는 IP 주소
+* admin 사용자 계정의 암호
+* JSON 구성 파일의 이름
+* 메시지 출력에 대한 상세 표시 플래그
+
+
+
+
+[[add-a-node-license]]
+== 노드 라이센스 추가
+
+프로덕션 클러스터를 배포하려면 _add_license.py_ 스크립트를 사용하여 각 노드에 라이센스를 추가해야 합니다. 라이센스는 클러스터 배포 전이나 후에 추가할 수 있습니다.
+
+스크립트의 CLI 입력 매개변수는 다음과 같습니다.
+
+* Deploy 서버의 호스트 이름 또는 IP 주소
+* admin 사용자 계정의 암호
+* 라이센스 파일 이름
+* 라이센스를 추가할 수 있는 권한을 가진 ONTAP 사용자 이름
+* ONTAP 사용자의 암호
+
+
+
+
+[[delete-a-cluster]]
+== 클러스터 삭제
+
+_delete_cluster.py_ 스크립트를 사용하여 기존 ONTAP Select 클러스터를 삭제할 수 있습니다.
+
+스크립트의 CLI 입력 매개변수는 다음과 같습니다.
+
+* Deploy 서버의 호스트 이름 또는 IP 주소
+* admin 사용자 계정의 암호
+* JSON 구성 파일의 이름
+

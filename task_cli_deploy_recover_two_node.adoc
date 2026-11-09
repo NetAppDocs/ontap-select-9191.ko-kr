@@ -1,0 +1,238 @@
+---
+sidebar: sidebar 
+permalink: task_cli_deploy_recover_two_node.html 
+keywords: administer, administering, cli, two node cluster, recover, recovering 
+summary: ONTAP Select Deploy 유틸리티가 어떤 이유로든 오류가 발생하거나 사용할 수 없게 되면 ONTAP Select 노드 및 클러스터를 관리할 수 없게 됩니다. 또한 Deploy에 포함된 중재자 서비스를 사용할 수 없게 되므로 모든 2노드 클러스터의 HA 기능이 상실됩니다. 복구할 수 없는 오류가 발생한 경우 관리 및 HA 기능을 복원하려면 Deploy 유틸리티 인스턴스를 복구해야 합니다. 
+---
+= 2노드 클러스터용 ONTAP Select Deploy 유틸리티 복구
+:hardbreaks:
+:allow-uri-read: 
+:nofooter: 
+:icons: font
+:linkattrs: 
+:imagesdir: ./media/
+
+
+[role="lead"]
+ONTAP Select Deploy 유틸리티가 어떤 이유로든 오류가 발생하거나 사용할 수 없게 되면 ONTAP Select 노드 및 클러스터를 관리할 수 없게 됩니다. 또한 Deploy에 포함된 중재자 서비스를 사용할 수 없게 되므로 모든 2노드 클러스터의 HA 기능이 상실됩니다. 복구할 수 없는 오류가 발생한 경우 관리 및 HA 기능을 복원하려면 Deploy 유틸리티 인스턴스를 복구해야 합니다.
+
+
+
+[[prepare-to-recover-the-deploy-utility]]
+== Deploy 유틸리티 복구 준비
+
+성공을 보장하려면 Deploy 유틸리티 인스턴스 복구를 시도하기 전에 준비해야 합니다. 여러 관리 절차를 숙지하고 필요한 정보를 확보해야 합니다.
+
+.단계
+. 하이퍼바이저 환경에 ONTAP Select Deploy 유틸리티의 새 인스턴스를 설치할 수 있는지 확인하십시오.
++
+link:task_install_deploy.html["ONTAP Select Deploy 유틸리티 설치에 대해 알아보십시오"]
+
+. ONTAP Select 클러스터에 로그인하고 ONTAP 클러스터 셸(CLI)에 액세스할 수 있는지 확인하십시오.
+. ONTAP Select 2노드 클러스터가 포함된 실패한 Deploy 유틸리티 인스턴스의 구성 데이터 백업이 있는지 확인하십시오. 클러스터가 포함되지 않은 백업이 있을 수도 있습니다.
+. 사용한 복구 절차에 따라 Deploy 구성 데이터의 백업을 복원할 수 있는지 확인하십시오.
++
+link:task_cli_migrate_deploy.html#step-3-restore-the-deploy-configuration-data-to-the-new-virtual-machine["새 가상 머신에 Deploy 구성 데이터를 복원하는 방법에 대해 알아보십시오"]
+
+. 실패한 원래 Deploy 유틸리티 가상 머신의 IP 주소를 알고 있습니다.
+. Capacity Pools 또는 Capacity Tiers 라이센스가 사용되는지 확인하십시오. Capacity Pools 라이센스를 사용하는 경우 Deploy 인스턴스를 복구 또는 복원한 후 각 Capacity Pool 라이센스를 다시 설치해야 합니다.
+. ONTAP Select Deploy 유틸리티 인스턴스를 복구할 때 사용할 절차를 결정하십시오. 이 결정은 ONTAP Select 2노드 클러스터가 포함된 원래 장애가 발생한 Deploy 유틸리티의 구성 데이터 백업이 있는지 여부를 기반으로 합니다.
++
+[cols="35,65"]
+|===
+| 2노드 클러스터가 포함된 Deploy 백업이 있습니까? | 복구 절차를 사용하십시오... 
+
+
+| 예 | <<restore-deploy-backup,구성 백업을 사용하여 Deploy 유틸리티 인스턴스를 복원합니다>> 
+
+
+| 아니요 | <<restore-and-recover-deploy,Deploy 유틸리티 인스턴스 재구성 및 복구>> 
+|===
+
+
+
+
+[[restore-a-deploy-utility-instance-using-a-configuration-backup]]
+[[restore-deploy-backup]]
+== 구성 백업을 사용하여 Deploy 유틸리티 인스턴스를 복원합니다
+
+2노드 클러스터가 포함된 실패한 Deploy 유틸리티 인스턴스의 백업이 있는 경우 구성 데이터를 새 Deploy 가상 머신 인스턴스로 복원할 수 있습니다. 그런 다음 ONTAP Select 클러스터의 두 노드에 대한 추가 구성을 수행하여 복구를 완료해야 합니다.
+
+.시작하기 전에
+2노드 클러스터가 포함된 원래의 실패한 Deploy 가상 머신에서 구성 데이터를 백업합니다. 2노드 클러스터의 ONTAP CLI에 로그인할 수 있어야 하며 두 노드의 ONTAP 이름을 알고 있어야 합니다.
+
+.이 작업 정보
+복원하는 구성 백업에 2노드 클러스터가 포함되어 있으므로 미디에이터 iSCSI 타겟과 사서함이 새 Deploy 유틸리티 가상 머신에 다시 생성됩니다.
+
+.단계
+. ONTAP Select Deploy 유틸리티의 새 인스턴스를 준비합니다.
++
+.. 새 Deploy 유틸리티 가상 머신을 설치합니다.
+.. 이전 백업에서 Deploy 구성을 새 가상 머신으로 복원합니다.
++
+설치 및 복원 절차에 대한 자세한 내용은 관련 작업을 참조하십시오.
+
+
+
+. ONTAP Select 2노드 클러스터의 ONTAP 명령줄 인터페이스에 로그인합니다.
+. 고급 권한 모드 시작:
++
+[source, cli]
+----
+set adv
+----
+. 새 Deploy 가상 머신의 IP 주소가 원래 Deploy 가상 머신의 IP 주소와 다른 경우 이전 중재자 iSCSI 타겟을 제거하고 새 타겟을 추가하십시오.
++
+[source, cli]
+----
+storage iscsi-initiator remove-target -node * -target-type mailbox
+----
++
+[source, cli]
+----
+storage iscsi-initiator add-target -node <node1_name> -label mediator -target-type mailbox -target-portal <ip_address> -target-name <target>
+----
++
+[source, cli]
+----
+storage iscsi-initiator add-target -node <node2_name> -label mediator -target-type mailbox -target-portal <ip_address> -target-name <target>
+----
++
+ `<ip_address>` 매개 변수는 새 Deploy 가상 머신의 IP 주소입니다.
+
++
+이러한 명령을 사용하면 ONTAP Select 노드가 새 Deploy 유틸리티 가상 머신의 메일박스 디스크를 검색할 수 있습니다.
+
+. 중재자 디스크의 이름을 확인합니다.
++
+[source, cli]
+----
+disk show -container-type mediator
+----
+. 사서함 디스크를 두 노드에 할당합니다.
++
+[source, cli]
+----
+disk assign -disk <mediator-disk1-name> -owner <node1-name>
+
+disk assign -disk <mediator-disk2-name> -owner <node2-name>
+----
+. 스토리지 페일오버가 설정되어 있는지 확인합니다.
++
+[source, cli]
+----
+storage failover show
+----
+
+
+.완료한 후
+Capacity Pool 라이센스를 사용하는 경우 각 Capacity Pool 라이센스를 다시 설치하십시오. 자세한 내용은 link:task_adm_licenses.html#reinstall-a-capacity-pool-license["Capacity Pool 라이센스 재설치"]를 참조하십시오.
+
+
+
+[[reconfigure-and-recover-a-deploy-utility-instance]]
+[[restore-and-recover-deploy]]
+== Deploy 유틸리티 인스턴스 재구성 및 복구
+
+2노드 클러스터가 포함된 실패한 Deploy 유틸리티 인스턴스의 백업이 없는 경우 새 Deploy 가상 머신에서 미디에이터 iSCSI 타겟과 메일박스를 구성하십시오. 그런 다음 ONTAP Select 클러스터의 2노드에 대한 추가 구성을 수행하여 복구를 완료합니다.
+
+.시작하기 전에
+새 Deploy 유틸리티 인스턴스의 미디에이터 타겟 이름을 가지고 있는지 확인합니다. 2노드 클러스터의 ONTAP CLI에 로그인할 수 있어야 하며 두 노드의 ONTAP 이름을 알고 있어야 합니다.
+
+.이 작업 정보
+2노드 클러스터가 포함되어 있지 않더라도 선택적으로 구성 백업을 새 Deploy 가상 머신에 복원할 수 있습니다. 복원 시 2노드 클러스터가 다시 생성되지 않으므로, Deploy의 ONTAP Select 온라인 설명서 웹 페이지를 통해 새 Deploy 유틸리티 인스턴스에 미디에이터 iSCSI 타겟 및 메일박스를 수동으로 추가해야 합니다. 2노드 클러스터에 로그인할 수 있어야 하며 두 노드의 ONTAP 이름을 알고 있어야 합니다.
+
+
+NOTE: 복구 절차의 목표는 정상적인 HA 테이크오버 및 반환 작업을 수행할 수 있는 정상 상태로 2노드 클러스터를 복원하는 것입니다.
+
+.단계
+. ONTAP Select Deploy 유틸리티의 새 인스턴스를 준비합니다.
++
+.. 새 Deploy 유틸리티 가상 머신을 설치합니다.
+.. 선택적으로 이전 백업에서 Deploy 구성을 새 가상 머신으로 복원할 수 있습니다.
++
+이전 백업을 복원하는 경우 새 Deploy 인스턴스에는 2노드 클러스터가 포함되지 않습니다. 설치 및 복원 절차에 대한 자세한 내용은 관련 정보 섹션을 참조하십시오.
+
+
+
+. ONTAP Select 2노드 클러스터의 ONTAP 명령줄 인터페이스에 로그인합니다.
+. 고급 권한 모드 시작:
++
+[source, cli]
+----
+set adv
+----
+. 중재자 iSCSI 타겟 이름 가져오기:
++
+[source, cli]
+----
+storage iscsi-initiator show -target-type mailbox
+----
+. 새로운 Deploy 유틸리티 가상 머신의 온라인 설명서 웹 페이지에 접속하여 admin 계정으로 로그인하십시오:
++
+`\http://<ip_address>/api/ui`
+
++
+Deploy 가상 머신의 IP 주소를 사용해야 합니다.
+
+. * Mediator * 를 선택한 다음 * GET /mediators * 를 선택합니다.
+. Deploy에서 관리하는 미디에이터 목록을 표시하려면 *Try it out!*을 선택합니다.
++
+원하는 미디에이터 인스턴스의 ID를 기록해 두십시오.
+
+. * Mediator * 를 선택한 다음 * POST * 를 선택합니다.
+. mediator_id에 값을 입력하세요.
+.  `iscsi_target` 옆에 있는 *모델*을 선택하고 이름 값을 입력합니다.
++
+iqn_name 매개 변수에 타겟 이름을 사용하십시오.
+
+. * Try it out! * 을 선택하여 미디에이터 iSCSI 타겟을 생성합니다.
++
+요청이 성공하면 HTTP 상태 코드 200을 받게 됩니다.
+
+. 새 Deploy 가상 머신의 IP 주소가 원래 Deploy 가상 머신의 IP 주소와 다른 경우 ONTAP CLI를 사용하여 기존 중재자 iSCSI 타겟을 제거하고 새 타겟을 추가해야 합니다.
++
+[source, cli]
+----
+storage iscsi-initiator remove-target -node * -target-type mailbox
+----
++
+[source, cli]
+----
+storage iscsi-initiator add-target -node <node1_name> -label mediator -target-type mailbox -target-portal <ip_address> -target-name <target>
+----
++
+[source, cli]
+----
+storage iscsi-initiator add-target -node <node2_name> -label mediator-target-type mailbox -target-portal <ip_address> -target-name <target>
+----
++
+ `<ip_address>` 매개 변수는 새 Deploy 가상 머신의 IP 주소입니다.
+
++
+이러한 명령을 사용하면 ONTAP Select 노드가 새 Deploy 유틸리티 가상 머신의 메일박스 디스크를 검색할 수 있습니다.
+
+. 중재자 디스크의 이름을 확인합니다.
++
+[source, cli]
+----
+disk show -container-type mediator
+----
+. 사서함 디스크를 두 노드에 할당합니다.
++
+[source, cli]
+----
+disk assign -disk <mediator-disk1-name> -owner <node1-name>
+
+disk assign -disk <mediator-disk2-name> -owner <node2-name>
+----
+. 스토리지 페일오버가 설정되어 있는지 확인합니다.
++
+[source, cli]
+----
+storage failover show
+----
+
+
+.완료한 후
+Capacity Pool 라이센스를 사용하는 경우 각 Capacity Pool 라이센스를 다시 설치하십시오. 자세한 내용은 link:task_adm_licenses.html#reinstall-a-capacity-pool-license["Capacity Pool 라이센스 재설치"]를 참조하십시오.

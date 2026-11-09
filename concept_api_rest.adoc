@@ -1,0 +1,60 @@
+---
+sidebar: sidebar 
+permalink: concept_api_rest.html 
+keywords: rest api, deploy rest api, rest, architecture, resources, state, uri, http, json 
+summary: 'REST(Representational State Transfer)는 분산 웹 애플리케이션을 생성하기 위한 스타일입니다. 웹 서비스 API 설계에 적용될 경우, 서버 기반 리소스를 노출하고 상태를 관리하기 위한 기술 및 모범 사례 세트를 설정합니다. 주요 프로토콜과 표준을 사용하여 ONTAP Select 클러스터를 배포하고 관리하기 위한 유연한 기반을 제공합니다.' 
+---
+= ONTAP Select 클러스터 배포 및 관리를 위한 REST 웹 서비스에 대해 알아보십시오.
+:hardbreaks:
+:allow-uri-read: 
+:nofooter: 
+:icons: font
+:linkattrs: 
+:imagesdir: ./media/
+
+
+[role="lead"]
+REST(Representational State Transfer)는 분산 웹 애플리케이션을 생성하기 위한 스타일입니다. 웹 서비스 API 설계에 적용될 경우, 서버 기반 리소스를 노출하고 상태를 관리하기 위한 기술 및 모범 사례 세트를 설정합니다. 주요 프로토콜과 표준을 사용하여 ONTAP Select 클러스터를 배포하고 관리하기 위한 유연한 기반을 제공합니다.
+
+
+
+[[architecture-and-classic-constraints]]
+== 아키텍처 및 기존 제약 조건
+
+REST는 2000년 UC Irvine에서 Roy Fielding이 박사 https://www.ics.uci.edu/~fielding/pubs/dissertation/top.htm["논문"] 학위 논문에서 공식적으로 정립했습니다. 이는 일련의 제약 조건을 통해 아키텍처 스타일을 정의하며, 이러한 제약 조건들은 웹 기반 애플리케이션과 기반 프로토콜을 개선합니다. 이러한 제약 조건은 상태 비저장 통신 프로토콜을 사용하는 클라이언트/서버 아키텍처 기반의 RESTful 웹 서비스 애플리케이션을 구축합니다.
+
+
+
+[[resources-and-state-representation]]
+== 리소스 및 상태 표현
+
+리소스는 웹 기반 시스템의 기본 구성 요소입니다. REST 웹 서비스 애플리케이션을 개발할 때 초기 설계 작업에는 다음이 포함됩니다.
+
+* 시스템 또는 서버 기반 리소스 식별 모든 시스템은 리소스를 사용하고 유지 관리합니다. 리소스는 파일, 비즈니스 트랜잭션, 프로세스 또는 관리 엔티티일 수 있습니다. REST 웹 서비스를 기반으로 하는 애플리케이션을 설계할 때 가장 먼저 해야 할 일 중 하나는 리소스를 식별하는 것입니다.
+* 리소스 상태 및 관련 상태 연산의 정의 리소스는 항상 유한한 수의 상태 중 하나에 있습니다. 상태와 상태 변경에 사용되는 관련 연산은 명확하게 정의되어야 합니다.
+
+
+클라이언트와 서버 간에 메시지가 교환되어 일반적인 CRUD(Create, Read, Update, Delete) 모델에 따라 리소스 상태에 액세스하고 변경합니다.
+
+
+
+[[uri-endpoints]]
+== URI 엔드포인트
+
+모든 REST 리소스는 잘 정의된 주소 지정 체계를 사용하여 정의되고 사용 가능해야 합니다. 리소스가 위치하고 식별되는 엔드포인트는 URI(Uniform Resource Identifier)를 사용합니다. URI는 네트워크의 각 리소스에 고유한 이름을 생성하기 위한 일반적인 프레임워크를 제공합니다. URL(Uniform Resource Locator)은 웹 서비스에서 리소스를 식별하고 액세스하는 데 사용되는 URI의 한 유형입니다. 리소스는 일반적으로 파일 디렉터리와 유사한 계층 구조로 노출됩니다.
+
+
+
+[[http-messages]]
+== HTTP 메시지
+
+HTTP(Hypertext Transfer Protocol)는 웹 서비스 클라이언트와 서버가 리소스에 대한 요청 및 응답 메시지를 교환하는 데 사용되는 프로토콜입니다. 웹 서비스 애플리케이션을 설계할 때 GET 및 POST와 같은 HTTP 동사는 리소스 및 해당 상태 관리 작업에 매핑됩니다.
+
+HTTP는 상태를 저장하지 않습니다. 따라서 관련된 요청과 응답들을 하나의 트랜잭션으로 묶으려면 요청/응답 데이터 흐름과 함께 전달되는 HTTP 헤더에 추가 정보를 포함해야 합니다.
+
+
+
+[[json-formatting]]
+== JSON 형식
+
+클라이언트와 서버 간에 정보를 구조화하고 전송하는 방법은 여러 가지가 있지만, 가장 일반적인 방법(그리고 Deploy REST API에서 사용되는 방법)은 JavaScript Object Notation(JSON)입니다. JSON은 간단한 데이터 구조를 일반 텍스트로 표현하기 위한 업계 표준이며, 리소스를 설명하는 상태 정보를 전송하는 데 사용됩니다.

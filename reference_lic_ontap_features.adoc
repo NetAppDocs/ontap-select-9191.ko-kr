@@ -1,0 +1,98 @@
+---
+sidebar: sidebar 
+permalink: reference_lic_ontap_features.html 
+keywords: license, licensing, ontap features, default ontap features 
+summary: ONTAP Select는 대부분의 ONTAP 기능을 완벽하게 지원합니다. ONTAP 기능 중 다수는 클러스터를 배포할 때 각 노드에 자동으로 라이선스가 부여됩니다. 그러나 일부 기능은 별도의 라이선스가 필요합니다. 
+---
+= ONTAP 기능에 대한 ONTAP Select 지원
+:hardbreaks:
+:allow-uri-read: 
+:nofooter: 
+:icons: font
+:linkattrs: 
+:imagesdir: ./media/
+
+
+[role="lead"]
+ONTAP Select는 대부분의 ONTAP 기능을 지원합니다. ONTAP 기능 중 다수는 클러스터를 배포할 때 각 노드에 자동으로 라이선스가 부여됩니다. 그러나 일부 기능은 별도의 라이선스가 필요합니다.
+
+
+NOTE: 하드웨어별 종속성이 있는 ONTAP 기능은 일반적으로 ONTAP Select에서 지원되지 않습니다.
+
+
+
+[[ontap-features-licensed-by-default]]
+[[licensed-ontap-features]]
+== 기본적으로 라이센스가 부여되는 ONTAP 기능
+
+다음 ONTAP 기능은 ONTAP Select에서 지원되며 기본적으로 라이센스가 부여됩니다.
+
+* ARP(Autonomous Ransomware Protection)(수동 업데이트)
+* CIFS
+* 중복 제거 및 압축
+* 키 관리 상호 운용성 프로토콜(KMIP)을 사용한 외부 키 관리
++
+link:https://docs.netapp.com/us-en/ontap/encryption-at-rest/configure-netapp-volume-encryption-concept.html["외부 키 관리 활성화 및 구성"^]에 대해 자세히 알아보십시오.
+
+* FlexCache
++
+ONTAP Select는 쓰기 백 기능이 있는 FlexCache 캐시 볼륨을 지원합니다. 쓰기 백업 기능이 있는 FlexCache 원본 볼륨은 지원하지 않습니다.
+
++
+link:concept_ots_overview.html#flexcache-write-back-with-ontap-select["ONTAP Select를 사용한 FlexCache 쓰기 저장에 대해 자세히 알아보십시오"]
+
+* FlexClone
+* iSCSI
+* NDMP
+* NetApp Volume Encryption(제한되지 않은 국가에서만 사용 가능)
+* NFS
+* TCP를 통한 NVMe
+* ONTAP 멀티 테넌시 기능
+* ONTAP S3
+* S3 SnapMirror
+* SnapLock Select
++
+SnapLock Select는 ONTAP Select용으로 설계된 ONTAP SnapLock 구현이며 SnapLock Enterprise를 포함합니다. SnapLock Compliance는 포함되어 있지 않습니다.
+
++
+link:https://docs.netapp.com/us-en/ontap/snaplock/index.html["ONTAP SnapLock"^]에 대해 알아보십시오
+
+* SnapMirror
++
+ONTAP Select는 비동기 SnapMirror에서 일관성 그룹을 지원하지 않습니다.
+
+* SnapRestore
+* SnapVault
+* 스토리지 VM 재해 복구(SVM DR)
++
+ONTAP Select는 SVM DR을 소스 및 대상으로 모두 지원하며 최대 16개의 관계를 설정할 수 있습니다. SVM DR 지원은 소스 ONTAP 버전에서 +2 버전까지만 사용할 수 있도록 제한됩니다. 예를 들어, ONTAP Select 9.16.1 소스는 대상 ONTAP 버전 9.16.1, 9.17.1 또는 9.18.1에 연결할 수 있습니다.
+
+
+
+
+
+[[ontap-features-that-are-separately-licensed]]
+[[other-ontap-features]]
+== 별도로 라이센스가 부여되는 ONTAP 기능
+
+기본적으로 라이선스가 부여되지 않은 ONTAP 기능에 대해서는 별도의 라이선스를 취득해야 합니다. 여기에는 다음이 포함됩니다.
+
+* FabricPool
++
+
+NOTE: StorageGRID를 사용할 때는 FabricPool 라이센스가 필요하지 않습니다.
+
+* MetroCluster SDS(ONTAP Select 프리미엄 라이센스 서비스)
+* SnapMirror 클라우드
++
+link:https://mysupport.netapp.com/site/help["비기술 지원 사례 개설"^]SnapMirror 클라우드 라이센스를 취득해야 합니다.
+
++
+link:https://docs.netapp.com/us-en/ontap/concepts/snapmirror-cloud-backups-object-store-concept.html["SnapMirror 클라우드 백업을 오브젝트 스토리지에 저장"^]에 대해 알아보십시오
+
+
+
+.관련 정보
+* link:concept_ots_overview.html#compare-ontap-select-and-ontap-9["ONTAP Select와 ONTAP 9 비교"]
+* link:https://mysupport.netapp.com/site/systems/master-license-keys["NetApp ONTAP 마스터 라이센스 키에 대해 알아보십시오"^]
+

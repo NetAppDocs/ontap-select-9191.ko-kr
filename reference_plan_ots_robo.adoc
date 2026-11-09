@@ -1,0 +1,35 @@
+---
+sidebar: sidebar 
+permalink: reference_plan_ots_robo.html 
+keywords: plan, planning, remote and branch office, robo 
+summary: '원격 사무실/지점(ROBO) 환경에 ONTAP Select를 배포할 수 있습니다. ROBO 배포 계획의 일환으로 목표를 지원하는 구성을 선택해야 합니다.' 
+---
+= ONTAP Select 원격 및 지사 구축
+:hardbreaks:
+:allow-uri-read: 
+:nofooter: 
+:icons: font
+:linkattrs: 
+:imagesdir: ./media/
+
+
+[role="lead"]
+원격 사무실/지점(ROBO) 환경에 ONTAP Select를 배포할 수 있습니다. ROBO 배포 계획의 일환으로 목표를 지원하는 구성을 선택해야 합니다.
+
+ROBO 환경에 ONTAP Select를 배포할 때 사용할 수 있는 주요 구성은 두 가지입니다.
+
+
+NOTE: ONTAP Select를 구축할 때 모든 VMware vSphere 라이센스를 사용할 수 있습니다.
+
+.ONTAP HA를 지원하는 ONTAP Select 2노드 클러스터
+ONTAP Select 2노드 클러스터는 하나의 HA 쌍으로 구성되며 ROBO 구축에 이상적입니다.
+
+.VMware를 지원하는 ONTAP Select 단일 노드 클러스터
+ROBO 환경에서 ONTAP Select 단일 노드 클러스터를 배포할 수 있습니다. 단일 노드에는 기본 HA 기능이 없지만 다음 방법 중 하나로 클러스터를 배포하여 스토리지 보호를 제공할 수 있습니다.
+
+* VMware HA를 사용한 공유 외부 스토리지
+* VMware vSAN
+
+
+
+NOTE: vSAN을 사용하는 경우 VMware vSAN ROBO 라이센스가 있어야 합니다.

@@ -1,0 +1,86 @@
+---
+sidebar: sidebar 
+permalink: task_cli_clusters.html 
+keywords: administer, administering, cli, clusters 
+summary: ONTAP Select 클러스터를 관리하기 위해 수행할 수 있는 몇 가지 관련 작업이 있습니다. 
+---
+= CLI를 사용하여 ONTAP Select 클러스터 관리
+:hardbreaks:
+:allow-uri-read: 
+:nofooter: 
+:icons: font
+:linkattrs: 
+:imagesdir: ./media/
+
+
+[role="lead"]
+CLI를 사용하여 ONTAP Select 클러스터를 관리하기 위해 수행할 수 있는 관련 작업이 몇 가지 있습니다.
+
+
+
+[[back-up-the-ontap-select-deploy-configuration-data]]
+== ONTAP Select Deploy 구성 데이터를 백업하십시오
+
+클러스터 배포 후와 같이 ONTAP Select Deploy 구성 데이터를 백업합니다. 데이터는 암호화된 단일 파일로 저장되며, 이 파일을 로컬 워크스테이션으로 다운로드할 수 있습니다.
+
+생성하는 백업 파일에는 모든 구성 데이터가 포함됩니다. 이 데이터에는 ONTAP Select 클러스터를 포함하여 배포 환경의 여러 측면에 대한 설명이 담겨 있습니다.
+
+.시작하기 전에
+백업 작업 중에 Deploy가 다른 작업을 수행하고 있지 않은지 확인하십시오.
+
+.단계
+. 관리자 계정으로 SSH를 사용하여 ONTAP Select Deploy 유틸리티 CLI에 로그인하십시오.
+. ONTAP Select Deploy 서버의 내부 디렉터리에 저장된 ONTAP Select Deploy 구성 데이터의 백업을 생성합니다.
++
+[source, cli]
+----
+deploy backup create
+----
+. 메시지가 표시되면 백업에 대한 암호를 제공합니다.
++
+백업 파일은 암호를 기반으로 암호화됩니다.
+
+. 시스템에서 사용 가능한 백업을 표시합니다.
++
+[source, cli]
+----
+deploy backup show -detailed
+----
+. *Created* 필드의 날짜를 기준으로 백업 파일을 선택하고 *Download URL* 값을 기록합니다.
++
+URL을 통해 백업 파일에 액세스할 수 있습니다.
+
+. 웹 브라우저 또는 Curl과 같은 유틸리티를 사용하여 URL을 통해 백업 파일을 로컬 워크스테이션으로 다운로드하십시오.
+
+
+
+
+[[delete-an-ontap-select-cluster]]
+== ONTAP Select 클러스터를 삭제합니다
+
+ONTAP Select 클러스터가 더 이상 필요하지 않을 경우 삭제할 수 있습니다.
+
+.시작하기 전에
+클러스터는 오프라인 상태여야 합니다.
+
+.단계
+. 관리자 계정으로 Deploy 가상 머신 CLI에 로그인하십시오.
+. 클러스터 상태 표시:
++
+[source, cli]
+----
+cluster show -name <cluster_name>
+----
+. 클러스터가 오프라인 상태가 아니면 오프라인 상태로 전환하십시오.
++
+[source, cli]
+----
+cluster offline -name <cluster_name>
+----
+. 클러스터가 오프라인 상태임을 확인한 후 클러스터를 삭제하십시오.
++
+[source, cli]
+----
+cluster delete -name <cluster_name>
+----
+
